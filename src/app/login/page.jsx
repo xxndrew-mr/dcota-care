@@ -165,7 +165,7 @@ export default function LoginPage() {
 
         .lp-brand span {
           display: block;
-          background: linear-gradient(90deg, #ed781eff, #e78b46ff);
+          background: linear-gradient(90deg, #ed1c24, #ef3a40ff);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -240,7 +240,7 @@ export default function LoginPage() {
           transition: color 0.2s;
         }
 
-        .lp-input-wrap:focus-within .lp-input-icon { color: #ed781eff; }
+        .lp-input-wrap:focus-within .lp-input-icon { color: #ed1c24; }
 
         .lp-input {
           width: 100%;
@@ -257,7 +257,7 @@ export default function LoginPage() {
         }
 
         .lp-input:focus {
-          border-color: #ed781eff;
+          border-color: #ed1c24;
           background: #fff;
           box-shadow: 0 0 0 4px rgba(237,120,30,0.08);
         }
@@ -279,7 +279,7 @@ export default function LoginPage() {
           padding: 0;
           transition: color 0.2s;
         }
-        .lp-eye:hover { color: #ed781eff; }
+        .lp-eye:hover { color: #ed1c24; }
 
         .lp-error {
           display: flex;
@@ -310,7 +310,7 @@ export default function LoginPage() {
           width: 100%;
           height: 50px;
           border-radius: 50px;
-          background: #ed781eff;
+          background: #ed1c24;
           color: #fff;
           font-size: 15px;
           font-weight: 700;
@@ -328,7 +328,7 @@ export default function LoginPage() {
         }
 
         .lp-btn:hover:not(:disabled) {
-          background: #ed781eff;
+          background: #ed1c24;
           box-shadow: 0 6px 24px rgba(237,120,30,0.38);
         }
 
