@@ -104,7 +104,7 @@ export default function LoginPage() {
         .lp-left-bg {
           position: absolute;
           inset: 0;
-          background-image: url('/bg3.jpg');
+          background-image: url('/dcota-bg-login.png');
           background-size: cover;
           background-position: center;
         }
@@ -165,7 +165,7 @@ export default function LoginPage() {
 
         .lp-brand span {
           display: block;
-          background: linear-gradient(90deg, #93c5fd, #bfdbfe);
+          background: linear-gradient(90deg, #ed781eff, #e78b46ff);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -240,7 +240,7 @@ export default function LoginPage() {
           transition: color 0.2s;
         }
 
-        .lp-input-wrap:focus-within .lp-input-icon { color: #2563eb; }
+        .lp-input-wrap:focus-within .lp-input-icon { color: #ed781eff; }
 
         .lp-input {
           width: 100%;
@@ -257,9 +257,9 @@ export default function LoginPage() {
         }
 
         .lp-input:focus {
-          border-color: #2563eb;
+          border-color: #ed781eff;
           background: #fff;
-          box-shadow: 0 0 0 4px rgba(37,99,235,0.08);
+          box-shadow: 0 0 0 4px rgba(237,120,30,0.08);
         }
 
         .lp-input::placeholder { color: #cbd5e1; }
@@ -279,7 +279,7 @@ export default function LoginPage() {
           padding: 0;
           transition: color 0.2s;
         }
-        .lp-eye:hover { color: #2563eb; }
+        .lp-eye:hover { color: #ed781eff; }
 
         .lp-error {
           display: flex;
@@ -310,7 +310,7 @@ export default function LoginPage() {
           width: 100%;
           height: 50px;
           border-radius: 50px;
-          background: #1d4ed8;
+          background: #ed781eff;
           color: #fff;
           font-size: 15px;
           font-weight: 700;
@@ -322,14 +322,14 @@ export default function LoginPage() {
           justify-content: center;
           gap: 8px;
           transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-          box-shadow: 0 4px 20px rgba(29,78,216,0.28);
+          box-shadow: 0 4px 20px rgba(237,120,30,0.28);
           font-family: inherit;
           letter-spacing: 0.01em;
         }
 
         .lp-btn:hover:not(:disabled) {
-          background: #1e40af;
-          box-shadow: 0 6px 24px rgba(29,78,216,0.38);
+          background: #ed781eff;
+          box-shadow: 0 6px 24px rgba(237,120,30,0.38);
         }
 
         .lp-btn:active:not(:disabled) { transform: scale(0.98); }
@@ -371,8 +371,8 @@ export default function LoginPage() {
             <div className="lp-left-top">
               <div className="lp-logo-box">
                 <Image
-                  src="/logo-login.png"
-                  alt="Onda Care"
+                  src="/dcota-logo.png"
+                  alt="Dcota Care"
                   width={34}
                   height={34}
                   style={{ objectFit: 'contain' }}
@@ -384,16 +384,16 @@ export default function LoginPage() {
             <div className="lp-left-bottom">
               <p className="lp-welcome">SELAMAT DATANG DI</p>
               <h1 className="lp-brand">
-                Onda Care
+                Dcota Care
                 <span>Onda Grup</span>
               </h1>
-              <p className="lp-tagline">Aplikasi saran dan masukan salesman Onda Grup.</p>
+              <p className="lp-tagline">Aplikasi saran dan masukan salesman Dcota.</p>
             </div>
           </div>
 
           {/* ── RIGHT PANEL ── */}
           <div className="lp-right">
-            <h2 className="lp-title">Masuk ke Onda Care</h2>
+            <h2 className="lp-title">Masuk ke Dcota Care</h2>
             <p className="lp-desc">Gunakan kredensial yang diberikan oleh admin.</p>
 
             <div className="lp-fields">
