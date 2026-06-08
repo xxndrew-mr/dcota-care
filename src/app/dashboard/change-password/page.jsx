@@ -2,14 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  KeyIcon, 
-  LockClosedIcon, 
-  CheckCircleIcon, 
-  ExclamationTriangleIcon,
+import {
   EyeIcon,
   EyeSlashIcon,
-  ArrowPathIcon 
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 
 export default function ChangePasswordPage() {
@@ -19,8 +15,7 @@ export default function ChangePasswordPage() {
     newPassword: '',
     confirmPassword: '',
   });
-  
-  // State untuk show/hide password
+
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -63,7 +58,6 @@ export default function ChangePasswordPage() {
 
       setSuccess('Password berhasil diperbarui. Demi keamanan, silakan login ulang.');
       setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -72,177 +66,185 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Header Section */}
-      <div className="mb-8 flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-sm border border-blue-100">
-          <KeyIcon className="h-7 w-7" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            Pengaturan Keamanan
-          </h1>
-          <p className="text-sm text-slate-500">
-            Ganti kata sandi Anda secara berkala untuk menjaga keamanan akun.
-          </p>
-        </div>
+    <div className="mx-auto max-w-2xl px-4 py-10">
+      {/* Breadcrumb / eyebrow */}
+      <div className="mb-6 flex items-center gap-3">
+        <span className="bg-red-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-white">
+          Akun
+        </span>
+        <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+          Dcota Care / Keamanan
+        </span>
       </div>
 
-      {/* Main Card */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50">
-        <div className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
-          <h2 className="text-sm font-semibold text-slate-700">Formulir Perubahan Password</h2>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Status Messages */}
-          {error && (
-            <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 animate-in zoom-in-95 duration-300">
-              <ExclamationTriangleIcon className="h-5 w-5 flex-shrink-0" />
-              <p className="font-medium">{error}</p>
-            </div>
-          )}
-
-          {success && (
-            <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700 animate-in zoom-in-95 duration-300">
-              <CheckCircleIcon className="h-5 w-5 flex-shrink-0" />
-              <p className="font-medium">{success}</p>
-            </div>
-          )}
-
-          {/* Password Saat Ini */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-slate-700">
-              Password Saat Ini
-            </label>
-            <div className="relative group">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                <LockClosedIcon className="h-5 w-5" />
-              </div>
-              <input
-                type={showCurrent ? "text" : "password"}
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleChange}
-                required
-                placeholder="Masukkan password lama"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/30 pl-10 pr-12 py-3 text-sm transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 shadow-sm"
-              />
-              <button
-                type="button"
-                onClick={() => setShowCurrent(!showCurrent)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
-              >
-                {showCurrent ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-              </button>
-            </div>
-          </div>
-
-          <div className="h-px bg-slate-100 w-full" />
-
-          {/* Password Baru */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-slate-700">
-              Password Baru
-            </label>
-            <div className="relative group">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                <KeyIcon className="h-5 w-5" />
-              </div>
-              <input
-                type={showNew ? "text" : "password"}
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleChange}
-                required
-                minLength={8}
-                placeholder="Minimal 8 karakter"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/30 pl-10 pr-12 py-3 text-sm transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 shadow-sm"
-              />
-              <button
-                type="button"
-                onClick={() => setShowNew(!showNew)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
-              >
-                {showNew ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-              </button>
-            </div>
-            <p className="text-[11px] text-slate-500 px-1">
-              Tips: Gunakan kombinasi huruf besar, kecil, dan angka.
-            </p>
-          </div>
-
-          {/* Konfirmasi Password */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-slate-700">
-              Konfirmasi Password Baru
-            </label>
-            <div className="relative group">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                <CheckCircleIcon className="h-5 w-5" />
-              </div>
-              <input
-                type={showConfirm ? "text" : "password"}
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                placeholder="Ulangi password baru"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/30 pl-10 pr-12 py-3 text-sm transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 shadow-sm"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
-              >
-                {showConfirm ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Action Button */}
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="
-                relative flex w-full items-center justify-center gap-3
-                rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white
-                shadow-lg shadow-blue-200 transition-all duration-200
-                hover:bg-blue-700 hover:shadow-blue-300
-                active:scale-[0.98]
-                disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none
-              "
-            >
-              {isLoading ? (
-                <>
-                  <ArrowPathIcon className="h-5 w-5 animate-spin" />
-                  Memproses...
-                </>
-              ) : (
-                'Simpan Perubahan Password'
-              )}
-            </button>
-            
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="mt-3 w-full text-center text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors"
-            >
-              Batal dan Kembali
-            </button>
-          </div>
-        </form>
+      {/* Headline */}
+      <div className="mb-10 border-b-2 border-slate-900 pb-8">
+        <h1 className="text-4xl font-black uppercase leading-none tracking-tight text-slate-900 sm:text-5xl">
+          Ganti <span className="text-red-600">Password.</span>
+        </h1>
+        <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-500">
+          Perbarui kata sandi akun Anda secara berkala. Isi tiga kolom di bawah
+          ini secara berurutan.
+        </p>
       </div>
 
-      {/* Footer Info */}
-      <div className="mt-8 rounded-xl bg-amber-50 border border-amber-100 p-4">
-        <div className="flex gap-3">
-          <ExclamationTriangleIcon className="h-5 w-5 text-amber-600 flex-shrink-0" />
-          <p className="text-xs leading-relaxed text-amber-800">
-            <span className="font-bold uppercase">Catatan Penting:</span> Setelah mengganti password, sesi aktif Anda di perangkat lain mungkin akan berakhir. Simpan password baru Anda di tempat yang aman.
-          </p>
+      {/* Status messages */}
+      {error && (
+        <div className="mb-6 flex items-start gap-3 border-l-4 border-red-600 bg-red-50 px-4 py-3">
+          <span className="mt-px text-[11px] font-bold uppercase tracking-widest text-red-600">
+            Error
+          </span>
+          <p className="text-sm font-medium text-red-700">{error}</p>
         </div>
+      )}
+
+      {success && (
+        <div className="mb-6 flex items-start gap-3 border-l-4 border-emerald-600 bg-emerald-50 px-4 py-3">
+          <span className="mt-px text-[11px] font-bold uppercase tracking-widest text-emerald-600">
+            Sukses
+          </span>
+          <p className="text-sm font-medium text-emerald-700">{success}</p>
+        </div>
+      )}
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="divide-y divide-slate-200 border border-slate-200">
+        {/* Field 01 */}
+        <SwissField
+          index="01"
+          label="Password Saat Ini"
+          name="currentPassword"
+          value={formData.currentPassword}
+          onChange={handleChange}
+          show={showCurrent}
+          onToggle={() => setShowCurrent(!showCurrent)}
+          placeholder="Masukkan password lama"
+          required
+        />
+
+        {/* Field 02 */}
+        <SwissField
+          index="02"
+          label="Password Baru"
+          name="newPassword"
+          value={formData.newPassword}
+          onChange={handleChange}
+          show={showNew}
+          onToggle={() => setShowNew(!showNew)}
+          placeholder="Minimal 8 karakter"
+          minLength={8}
+          hint="Gunakan kombinasi huruf besar, kecil, dan angka."
+          required
+        />
+
+        {/* Field 03 */}
+        <SwissField
+          index="03"
+          label="Konfirmasi Password Baru"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          show={showConfirm}
+          onToggle={() => setShowConfirm(!showConfirm)}
+          placeholder="Ulangi password baru"
+          required
+        />
+
+        {/* Actions */}
+        <div className="bg-slate-50 p-6">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="flex w-full items-center justify-center gap-3 bg-red-600 px-4 py-4 text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-red-700 active:translate-y-px disabled:cursor-not-allowed disabled:bg-slate-300"
+          >
+            {isLoading ? (
+              <>
+                <ArrowPathIcon className="h-5 w-5 animate-spin" />
+                Memproses
+              </>
+            ) : (
+              'Simpan Perubahan'
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="mt-4 w-full text-center text-[11px] font-bold uppercase tracking-widest text-slate-400 transition-colors hover:text-slate-900"
+          >
+            Batal dan Kembali
+          </button>
+        </div>
+      </form>
+
+      {/* Footer note */}
+      <div className="mt-8 border-l-4 border-amber-500 bg-amber-50 px-4 py-4">
+        <p className="text-xs leading-relaxed text-amber-900">
+          <span className="font-bold uppercase tracking-wide">Catatan — </span>
+          Setelah mengganti password, sesi aktif Anda di perangkat lain mungkin
+          akan berakhir. Simpan password baru Anda di tempat yang aman.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ---- Reusable Swiss-style field ---- */
+function SwissField({
+  index,
+  label,
+  name,
+  value,
+  onChange,
+  show,
+  onToggle,
+  placeholder,
+  hint,
+  minLength,
+  required,
+}) {
+  return (
+    <div className="grid grid-cols-[auto_1fr] gap-x-5 p-6">
+      <span className="font-mono text-sm font-bold text-slate-300">{index}</span>
+
+      <div>
+        <label
+          htmlFor={name}
+          className="block text-[11px] font-bold uppercase tracking-widest text-slate-700"
+        >
+          {label}
+        </label>
+
+        <div className="relative mt-3">
+          <input
+            id={name}
+            type={show ? 'text' : 'password'}
+            name={name}
+            value={value}
+            onChange={onChange}
+            required={required}
+            minLength={minLength}
+            placeholder={placeholder}
+            className="w-full border-0 border-b-2 border-slate-200 bg-transparent pb-2 pr-10 text-base text-slate-900 placeholder:text-slate-300 transition-colors focus:border-red-600 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={onToggle}
+            tabIndex={-1}
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-900"
+            aria-label={show ? 'Sembunyikan password' : 'Tampilkan password'}
+          >
+            {show ? (
+              <EyeSlashIcon className="h-5 w-5" />
+            ) : (
+              <EyeIcon className="h-5 w-5" />
+            )}
+          </button>
+        </div>
+
+        {hint && (
+          <p className="mt-2 text-[11px] text-slate-400">{hint}</p>
+        )}
       </div>
     </div>
   );
