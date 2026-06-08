@@ -41,6 +41,31 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Rebrand Tailwind Blue to Dcota Red-Orange signature palette */
+  --color-blue-50: #fff5f5;
+  --color-blue-100: #ffe3e3;
+  --color-blue-200: #ffd0d0;
+  --color-blue-300: #ffb3b3;
+  --color-blue-400: #fca5a5;
+  --color-blue-500: #ef4444; /* red-500 */
+  --color-blue-600: #ed781e; /* Dcota orange #ed781eff */
+  --color-blue-700: #dc2626; /* red-600 */
+  --color-blue-800: #b91c1c; /* red-800 */
+  --color-blue-900: #7f1d1d;
+
+  /* Rebrand Tailwind Indigo to Dcota Sunset/Deep Red palette */
+  --color-indigo-50: #fff5f5;
+  --color-indigo-100: #ffe3e3;
+  --color-indigo-200: #ffd0d0;
+  --color-indigo-300: #ffb3b3;
+  --color-indigo-400: #fca5a5;
+  --color-indigo-500: #ef4444; /* red-500 */
+  --color-indigo-600: #ed781e; /* Dcota orange */
+  --color-indigo-700: #dc2626; /* red-600 */
+  --color-indigo-800: #b91c1c; /* red-800 */
+  --color-indigo-900: #7f1d1d;
+  --color-indigo-950: #450a0a;
 }
 
 @keyframes slideBg {

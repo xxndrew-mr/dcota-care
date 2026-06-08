@@ -20,21 +20,9 @@ import {
   ClockIcon,
   ChartBarIcon,
   ChevronDownIcon,
-  ChevronRightIcon,
-  UserCircleIcon,
   KeyIcon,
 } from '@heroicons/react/24/outline';
 
-import { Button } from '@/components/ui/button';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
 import { cn } from "@/lib/utils";
 
 export default function DashboardLayout({ children }) {
@@ -42,19 +30,10 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
-  // Logic untuk mendeteksi scroll
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 8);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -67,13 +46,17 @@ export default function DashboardLayout({ children }) {
 
   if (status === 'loading') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative flex h-16 w-16 items-center justify-center">
-            <div className="absolute h-full w-full animate-spin rounded-full border-4 border-slate-200 border-t-blue-600"></div>
-            <Image src="/logo-login.png" alt="Loading" width={30} height={30} className="opacity-50" />
-          </div>
-          <p className="text-sm font-medium text-slate-500 animate-pulse">Menyiapkan Workspace...</p>
+      <div className="flex min-h-screen items-center justify-center bg-white dcota-sans">
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+          .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+          .dcota-mono { font-family: 'JetBrains Mono', monospace; }
+        `}</style>
+        <div className="flex flex-col items-center gap-5">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#ed1c24] border-t-transparent" />
+          <p className="dcota-mono text-[10.5px] font-medium uppercase tracking-[0.22em] text-slate-400">
+            Loading Workspace
+          </p>
         </div>
       </div>
     );
@@ -83,12 +66,12 @@ export default function DashboardLayout({ children }) {
 
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: HomeIcon, roles: ['Administrator', 'Salesman', 'Agen', 'PIC OMI', 'Sales Manager', 'Acting Manager', 'Acting PIC', 'User Feedback', 'Viewer', 'PIC OMI (SS)'] },
-    { href: '/dashboard/submit', label: 'Submit Baru', icon: DocumentPlusIcon, roles: ['Salesman', 'Agen'] },
-    { href: '/dashboard/my-tickets', label: 'Riwayat Saya', icon: TicketIcon, roles: ['Salesman', 'Agen'] },
-    { href: '/dashboard/queue', label: userRole === 'PIC OMI' ? 'Antrian Triase' : 'Antrian Tugas', icon: ClipboardDocumentListIcon, roles: ['PIC OMI', 'PIC OMI (SS)', 'Sales Manager', 'Acting Manager', 'Acting PIC'] },
-    { href: '/dashboard/history', label: 'Riwayat Aksi', icon: ClockIcon, roles: ['PIC OMI', 'PIC OMI (SS)', 'Sales Manager', 'Acting Manager', 'Acting PIC', 'Viewer'] },
-    { href: '/dashboard/admin/users', label: 'User Management', icon: UsersIcon, roles: ['Administrator'] },
-    { href: '/dashboard/admin/analytics', label: 'Analitik', icon: ChartBarIcon, roles: ['Administrator', 'Viewer'] },
+    { href: '/dashboard/submit', label: 'Submit', icon: DocumentPlusIcon, roles: ['Salesman', 'Agen'] },
+    { href: '/dashboard/my-tickets', label: 'Riwayat', icon: TicketIcon, roles: ['Salesman', 'Agen'] },
+    { href: '/dashboard/queue', label: userRole === 'PIC OMI' ? 'Triase' : 'Antrian', icon: ClipboardDocumentListIcon, roles: ['PIC OMI', 'PIC OMI (SS)', 'Sales Manager', 'Acting Manager', 'Acting PIC'] },
+    { href: '/dashboard/history', label: 'History', icon: ClockIcon, roles: ['PIC OMI', 'PIC OMI (SS)', 'Sales Manager', 'Acting Manager', 'Acting PIC', 'Viewer'] },
+    { href: '/dashboard/admin/users', label: 'Users', icon: UsersIcon, roles: ['Administrator'] },
+    { href: '/dashboard/admin/analytics', label: 'Analytics', icon: ChartBarIcon, roles: ['Administrator', 'Viewer'] },
   ];
 
   const FEEDBACK_ALLOWED = ['Sales Manager', 'User Feedback', 'Viewer'];
@@ -98,252 +81,479 @@ export default function DashboardLayout({ children }) {
 
   const handleLogout = () => signOut({ callbackUrl: '/login' });
 
+  const initial = session?.user?.name?.charAt(0)?.toUpperCase() || '—';
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      {/* --- NAV BAR DENGAN EFEK TRANSPARAN --- */}
-      <header 
-        className={cn(
-          "sticky top-0 z-40 w-full transition-all duration-300 border-b",
-          isScrolled 
-            ? "bg-blue-900/80 backdrop-blur-md border-blue-700/30 shadow-lg py-1" 
-            : "bg-blue-800 border-blue-700/20 py-2 shadow-blue-900/10"
-        )}
-      >
-        <div className="flex h-16 w-full items-center justify-between px-6 lg:px-10">
-          
-          <div className="flex items-center gap-4">
-            <button
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition-all hover:bg-white/20 active:scale-95 md:hidden"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Bars3Icon className="h-6 w-6" />
-            </button>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
+      `}</style>
 
-            <Link href="/dashboard" className="flex items-center gap-3 transition-opacity hover:opacity-90">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-1.5 shadow-inner">
-                <Image src="/logo-login.png" alt="Onda Logo" width={32} height={32} priority />
-              </div>
-              <div className="hidden flex-col sm:flex text-white">
-                <span className="text-sm font-bold leading-none tracking-tight">Onda Care</span>
-                <span className="mt-1 text-[10px] font-medium uppercase tracking-widest text-blue-200/70">Workspace</span>
-              </div>
-            </Link>
-          </div>
+      <div className="dcota-sans min-h-screen bg-white">
 
-          <div className="hidden md:block">
-            <NavDesktop menu={filteredMenu} userRole={userRole} isFeedbackActive={isFeedbackActive} feedbackAllowed={FEEDBACK_ALLOWED} />
-          </div>
+        {/* ═══════════════════════════════════════════════════════════
+            NAVBAR — Swiss flat, hairline border, aksen merah dominan
+        ═══════════════════════════════════════════════════════════ */}
+        <header
+          className={cn(
+            "sticky top-0 z-40 w-full bg-white transition-shadow duration-300",
+            "border-b border-slate-200",
+            isScrolled && "shadow-[0_1px_0_0_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.08)]"
+          )}
+        >
+          {/* garis merah tipis paling atas — pengikat identitas */}
+          <div className="h-[3px] w-full bg-[#ed1c24]" />
 
-          <div className="flex items-center gap-2 sm:gap-4 text-white">
-            <div className="hidden flex-col items-end sm:flex">
-              <span className="text-xs font-semibold">{session?.user?.name}</span>
-              <span className="text-[10px] font-medium text-blue-200">{session?.user?.role}</span>
+          <div className="mx-auto max-w-[1440px] flex h-16 items-center px-6 lg:px-12">
+
+            {/* — LEFT: Logo + Brand — */}
+            <div className="flex items-center gap-8">
+              <button
+                className="flex h-10 w-10 items-center justify-center text-slate-900 hover:bg-[#ed1c24] hover:text-white transition-colors md:hidden -ml-1"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Buka menu"
+              >
+                <Bars3Icon className="h-5 w-5" strokeWidth={2} />
+              </button>
+
+              <Link href="/dashboard" className="flex items-center gap-3 group">
+                {/* logo box merah — warna brand dominan */}
+                <div className="flex h-9 w-9 items-center justify-center bg-[#ed1c24] transition-colors duration-300">
+                  <Image
+                    src="/dcota-logo.png"
+                    alt="Dcota"
+                    width={20}
+                    height={20}
+                    className="invert brightness-0"
+                    priority
+                  />
+                </div>
+                <div className="hidden sm:flex flex-col leading-none">
+                  <span className="text-[13px] font-extrabold tracking-tight text-slate-900">
+                    Dcota Care
+                  </span>
+                  <span className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-slate-400 mt-1">
+                    Onda Grup
+                  </span>
+                </div>
+              </Link>
             </div>
 
-            <Menu as="div" className="relative">
-              <Menu.Button className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/20 bg-blue-700 shadow-sm transition-all hover:bg-blue-600">
-                <UserCircleIcon className="h-6 w-6" />
-              </Menu.Button>
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
-                <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl bg-white p-2 shadow-2xl ring-1 ring-black/5 focus:outline-none">
-                  <div className="px-3 py-2 border-b border-slate-100 mb-1 sm:hidden">
-                     <p className="text-sm font-bold text-slate-900">{session?.user?.name}</p>
-                     <p className="text-xs text-slate-500">{session?.user?.role}</p>
-                  </div>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <Link href="/dashboard/change-password" className={cn("group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors", active ? "bg-slate-100 text-blue-700" : "text-slate-600")}>
-                        <KeyIcon className="h-4 w-4" /> Ganti Password
-                      </Link>
+            {/* — CENTER: Nav items (desktop) — */}
+            <nav className="hidden md:flex items-center gap-1 ml-12 flex-1">
+              {filteredMenu.map((item) => {
+                const active = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "relative flex items-center gap-2 px-3.5 h-16 text-[13px] font-semibold tracking-tight transition-colors",
+                      active
+                        ? "text-[#ed1c24]"
+                        : "text-slate-500 hover:text-slate-900"
                     )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <button onClick={handleLogout} className={cn("group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-red-600", active ? "bg-red-50" : "")}>
-                        <ArrowLeftOnRectangleIcon className="h-4 w-4" /> Logout
-                      </button>
+                  >
+                    <item.icon className="h-4 w-4" strokeWidth={2} />
+                    {item.label}
+                    {/* underline merah: solid saat aktif, muncul saat hover */}
+                    <span
+                      className={cn(
+                        "absolute left-3 right-3 -bottom-px h-[2.5px] bg-[#ed1c24] origin-left transition-transform duration-300",
+                        active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                      )}
+                    />
+                  </Link>
+                );
+              })}
+
+              {/* Feedback dropdown */}
+              {FEEDBACK_ALLOWED.includes(userRole) && (
+                <Menu as="div" className="relative">
+                  <Menu.Button
+                    className={cn(
+                      "relative flex items-center gap-2 px-3.5 h-16 text-[13px] font-semibold tracking-tight transition-colors outline-none",
+                      isFeedbackActive
+                        ? "text-[#ed1c24]"
+                        : "text-slate-500 hover:text-slate-900"
                     )}
-                  </Menu.Item>
-                </Menu.Items>
-              </Transition>
-            </Menu>
-          </div>
-        </div>
-      </header>
-
-      {/* --- MOBILE SIDEBAR --- */}
-      <Transition.Root show={sidebarOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-50 md:hidden" onClose={setSidebarOpen}>
-          <Transition.Child as={Fragment} enter="transition-opacity ease-linear duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="transition-opacity ease-linear duration-300" leaveFrom="opacity-100" leaveTo="opacity-0">
-            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 flex">
-            <Transition.Child as={Fragment} enter="transition ease-in-out duration-300 transform" enterFrom="-translate-x-full" enterTo="translate-x-0" leave="transition ease-in-out duration-300 transform" leaveFrom="translate-x-0" leaveTo="-translate-x-full">
-              <Dialog.Panel className="relative flex w-full max-w-xs flex-col bg-blue-900 shadow-2xl">
-                <div className="flex h-16 items-center justify-between px-6 border-b border-white/10 text-white">
-                  <div className="flex items-center gap-3">
-                    <Image src="/logo-login.png" alt="Logo" width={28} height={28} className="brightness-0 invert" />
-                    <span className="font-bold">Onda Care</span>
-                  </div>
-                  <button onClick={() => setSidebarOpen(false)} className="text-white/70 hover:text-white">
-                    <XMarkIcon className="h-6 w-6" />
-                  </button>
-                </div>
-
-                <div className="flex-1 overflow-y-auto px-4 py-6">
-                  <NavMobile menu={filteredMenu} userRole={userRole} onNavigate={() => setSidebarOpen(false)} feedbackAllowed={FEEDBACK_ALLOWED} feedbackRoutes={FEEDBACK_ROUTES} />
-                </div>
-
-                <div className="border-t border-white/10 p-4">
-                  <Button onClick={handleLogout} variant="destructive" className="w-full justify-start gap-3 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border-none shadow-none">
-                    <ArrowLeftOnRectangleIcon className="h-5 w-5" /> Logout
-                  </Button>
-                </div>
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
-        </Dialog>
-      </Transition.Root>
-
-      <main className="w-full">
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-          {children}
-        </div>
-      </main>
-    </div>
-  );
-}
-
-// --- SUB-COMPONENTS TETAP SAMA ---
-
-function NavDesktop({ menu, userRole, isFeedbackActive, feedbackAllowed }) {
-  const pathname = usePathname();
-  
-  return (
-    <NavigationMenu>
-      <NavigationMenuList className="gap-1">
-        {menu.map((item) => (
-          <NavigationMenuItem key={item.href}>
-            <NavigationMenuLink asChild
-              className={cn(
-                navigationMenuTriggerStyle(),
-                "h-9 px-3 text-sm font-medium transition-all bg-transparent",
-                pathname === item.href 
-                  ? "bg-white/15 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-1 ring-white/20" 
-                  : "text-blue-100 hover:bg-white/10 hover:text-white"
+                  >
+                    <InboxStackIcon className="h-4 w-4" strokeWidth={2} />
+                    Feedback
+                    <ChevronDownIcon className="h-3.5 w-3.5 ui-open:rotate-180 transition-transform" strokeWidth={2} />
+                    <span
+                      className={cn(
+                        "absolute left-3 right-3 -bottom-px h-[2.5px] bg-[#ed1c24] origin-left transition-transform duration-300",
+                        isFeedbackActive ? "scale-x-100" : "scale-x-0"
+                      )}
+                    />
+                  </Menu.Button>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-150"
+                    enterFrom="opacity-0 -translate-y-1"
+                    enterTo="opacity-100 translate-y-0"
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <Menu.Items className="absolute left-0 top-full mt-0 w-[280px] bg-white border border-slate-200 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] focus:outline-none divide-y divide-slate-100">
+                      <DropdownItem href="/dashboard/feedback" code="01" title="Antrian Feedback" desc="Kelola feedback pelanggan" />
+                      <DropdownItem href="/dashboard/bookmarks" code="02" title="Bookmark" desc="Akses cepat laporan penting" />
+                      <DropdownItem href="/dashboard/archive" code="03" title="Arsip" desc="Data yang telah selesai" />
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
               )}
-            >
-              <Link href={item.href}>
-                <item.icon className="mr-2 h-4 w-4" />
-                {item.label}
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        ))}
+            </nav>
 
-        {feedbackAllowed.includes(userRole) && (
-          <NavigationMenuItem>
-            <NavigationMenuTrigger className={cn(
-               "h-9 bg-transparent text-sm font-medium",
-               isFeedbackActive ? "bg-white/15 text-white ring-1 ring-white/20" : "text-blue-100 hover:bg-white/10"
-            )}>
-              <InboxStackIcon className="mr-2 h-4 w-4" /> Feedback
-            </NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid w-[280px] gap-2 p-3 bg-white">
-                <NavListItem href="/dashboard/feedback" title="Antrian Feedback" icon={InboxStackIcon}>
-                  Kelola feedback pelanggan.
-                </NavListItem>
-                <NavListItem href="/dashboard/bookmarks" title="Bookmark" icon={TicketIcon}>
-                  Akses cepat laporan penting.
-                </NavListItem>
-                <NavListItem href="/dashboard/archive" title="Arsip" icon={ClockIcon}>
-                  Lihat data yang telah selesai.
-                </NavListItem>
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        )}
-      </NavigationMenuList>
-    </NavigationMenu>
+            {/* — RIGHT: User — */}
+            <div className="flex items-center gap-4 ml-auto md:ml-0">
+              <div className="hidden lg:flex items-center gap-2 dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Online
+              </div>
+
+              <div className="hidden md:block h-6 w-px bg-slate-200" />
+
+              <Menu as="div" className="relative">
+                <Menu.Button className="flex items-center gap-3 group outline-none">
+                  {/* Avatar Swiss: kotak merah dengan initial mono */}
+                  <div className="flex h-9 w-9 items-center justify-center bg-[#ed1c24] group-hover:bg-[#c8131a] transition-colors duration-300 dcota-mono text-[13px] font-bold text-white">
+                    {initial}
+                  </div>
+                  <div className="hidden sm:flex flex-col items-start leading-none">
+                    <span className="text-[12.5px] font-bold tracking-tight text-slate-900 max-w-[140px] truncate">
+                      {session?.user?.name}
+                    </span>
+                    <span className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-400 mt-1">
+                      {session?.user?.role}
+                    </span>
+                  </div>
+                  <ChevronDownIcon className="hidden sm:block h-3.5 w-3.5 text-slate-400 ui-open:rotate-180 transition-transform" strokeWidth={2} />
+                </Menu.Button>
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-150"
+                  enterFrom="opacity-0 -translate-y-1"
+                  enterTo="opacity-100 translate-y-0"
+                  leave="transition ease-in duration-100"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <Menu.Items className="absolute right-0 mt-3 w-[260px] bg-white border border-slate-200 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.16)] focus:outline-none">
+                    <div className="px-5 py-4 border-b border-slate-100 border-l-2 border-l-[#ed1c24]">
+                      <p className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#ed1c24] mb-1.5">
+                        Signed in as
+                      </p>
+                      <p className="text-[14px] font-extrabold tracking-tight text-slate-900 leading-tight">
+                        {session?.user?.name}
+                      </p>
+                      <p className="dcota-mono text-[11px] font-semibold text-slate-500 mt-1">
+                        {session?.user?.role}
+                      </p>
+                    </div>
+
+                    <div className="divide-y divide-slate-100">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            href="/dashboard/change-password"
+                            className={cn(
+                              "flex items-center justify-between gap-3 px-5 py-3.5 text-[13px] font-semibold transition-colors",
+                              active ? "bg-slate-50 text-slate-900" : "text-slate-700"
+                            )}
+                          >
+                            <span className="flex items-center gap-3">
+                              <KeyIcon className="h-4 w-4" strokeWidth={2} />
+                              Ganti Password
+                            </span>
+                            <span className="dcota-mono text-[10px] text-slate-300">→</span>
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={handleLogout}
+                            className={cn(
+                              "flex w-full items-center justify-between gap-3 px-5 py-3.5 text-[13px] font-semibold transition-colors",
+                              active ? "bg-[#ed1c24] text-white" : "text-[#ed1c24]"
+                            )}
+                          >
+                            <span className="flex items-center gap-3">
+                              <ArrowLeftOnRectangleIcon className="h-4 w-4" strokeWidth={2} />
+                              Logout
+                            </span>
+                            <span className="dcota-mono text-[10px] opacity-60">→</span>
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                  </Menu.Items>
+                </Transition>
+              </Menu>
+            </div>
+          </div>
+        </header>
+
+        {/* ═══════════════════════════════════════════════════════════
+            MOBILE SIDEBAR — putih flat, match navbar
+        ═══════════════════════════════════════════════════════════ */}
+        <Transition.Root show={sidebarOpen} as={Fragment}>
+          <Dialog as="div" className="relative z-50 md:hidden" onClose={setSidebarOpen}>
+            <Transition.Child
+              as={Fragment}
+              enter="transition-opacity ease-out duration-200"
+              enterFrom="opacity-0" enterTo="opacity-100"
+              leave="transition-opacity ease-in duration-150"
+              leaveFrom="opacity-100" leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px]" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 flex">
+              <Transition.Child
+                as={Fragment}
+                enter="transition ease-out duration-300 transform"
+                enterFrom="-translate-x-full" enterTo="translate-x-0"
+                leave="transition ease-in duration-250 transform"
+                leaveFrom="translate-x-0" leaveTo="-translate-x-full"
+              >
+                <Dialog.Panel className="dcota-sans relative flex w-full max-w-[320px] flex-col bg-white">
+                  {/* garis merah pengikat identitas */}
+                  <div className="h-[3px] w-full bg-[#ed1c24]" />
+
+                  {/* Sidebar header */}
+                  <div className="flex h-16 items-center justify-between px-6 border-b border-slate-200">
+                    <Link href="/dashboard" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center bg-[#ed1c24]">
+                        <Image src="/dcota-logo.png" alt="Logo" width={20} height={20} className="invert brightness-0" />
+                      </div>
+                      <div className="flex flex-col leading-none">
+                        <span className="text-[13px] font-extrabold tracking-tight text-slate-900">
+                          Dcota Care
+                        </span>
+                        <span className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-slate-400 mt-1">
+                          Onda Grup
+                        </span>
+                      </div>
+                    </Link>
+                    <button
+                      onClick={() => setSidebarOpen(false)}
+                      className="flex h-10 w-10 items-center justify-center text-slate-900 hover:bg-[#ed1c24] hover:text-white transition-colors -mr-1"
+                      aria-label="Tutup menu"
+                    >
+                      <XMarkIcon className="h-5 w-5" strokeWidth={2} />
+                    </button>
+                  </div>
+
+                  {/* User info strip */}
+                  <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center bg-[#ed1c24] dcota-mono text-[14px] font-bold text-white">
+                      {initial}
+                    </div>
+                    <div className="flex flex-col leading-tight min-w-0">
+                      <span className="text-[13px] font-extrabold tracking-tight text-slate-900 truncate">
+                        {session?.user?.name}
+                      </span>
+                      <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 mt-1">
+                        {session?.user?.role}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Nav items */}
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="px-6 pt-5 pb-2">
+                      <p className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#ed1c24]">
+                        Menu
+                      </p>
+                    </div>
+                    <NavMobile
+                      menu={filteredMenu}
+                      userRole={userRole}
+                      onNavigate={() => setSidebarOpen(false)}
+                      feedbackAllowed={FEEDBACK_ALLOWED}
+                      feedbackRoutes={FEEDBACK_ROUTES}
+                    />
+                  </div>
+
+                  {/* Footer actions */}
+                  <div className="border-t border-slate-200 divide-y divide-slate-100">
+                    <Link
+                      href="/dashboard/change-password"
+                      onClick={() => setSidebarOpen(false)}
+                      className="flex items-center gap-3 px-6 py-4 text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <KeyIcon className="h-4 w-4" strokeWidth={2} />
+                      Ganti Password
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 px-6 py-4 text-[13px] font-semibold text-[#ed1c24] hover:bg-[#ed1c24] hover:text-white transition-colors w-full"
+                    >
+                      <ArrowLeftOnRectangleIcon className="h-4 w-4" strokeWidth={2} />
+                      Logout
+                    </button>
+                  </div>
+
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </Dialog>
+        </Transition.Root>
+
+        {/* ═══════════════════════════════════════════════════════════
+            MAIN CONTENT
+        ═══════════════════════════════════════════════════════════ */}
+        <main className="w-full">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+            {children}
+          </div>
+        </main>
+      </div>
+    </>
   );
 }
 
+/* ─────────────────────────────────────────────
+   DROPDOWN ITEM (Desktop feedback dropdown)
+───────────────────────────────────────────── */
+function DropdownItem({ href, code, title, desc }) {
+  return (
+    <Menu.Item>
+      {({ active }) => (
+        <Link
+          href={href}
+          className={cn(
+            "group flex items-start gap-4 px-5 py-4 transition-colors border-l-2",
+            active ? "bg-slate-50 border-[#ed1c24]" : "bg-white border-transparent"
+          )}
+        >
+          <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 mt-1 group-hover:text-[#ed1c24] transition-colors">
+            {code}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-extrabold tracking-tight text-slate-900 leading-tight">
+              {title}
+            </p>
+            <p className="text-[11.5px] text-slate-500 mt-0.5 leading-snug">
+              {desc}
+            </p>
+          </div>
+        </Link>
+      )}
+    </Menu.Item>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   MOBILE NAV
+───────────────────────────────────────────── */
 function NavMobile({ menu, onNavigate, feedbackAllowed, userRole, feedbackRoutes }) {
   const pathname = usePathname();
   const [feedbackOpen, setFeedbackOpen] = useState(feedbackRoutes.includes(pathname));
 
   return (
-    <nav className="flex flex-col gap-1">
-      {menu.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          onClick={onNavigate}
-          className={cn(
-            "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
-            pathname === item.href ? "bg-white text-blue-900 shadow-lg shadow-black/10" : "text-blue-100 hover:bg-white/10"
-          )}
-        >
-          <item.icon className="h-5 w-5" />
-          {item.label}
-        </Link>
-      ))}
+    <nav className="flex flex-col">
+      {menu.map((item, idx) => {
+        const active = pathname === item.href;
+        const code = String(idx + 1).padStart(2, '0');
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "relative flex items-center gap-4 px-6 py-4 transition-colors border-l-2",
+              active
+                ? "border-[#ed1c24] bg-[#ed1c24]/[0.06]"
+                : "border-transparent hover:bg-slate-50"
+            )}
+          >
+            <span className={cn(
+              "dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em]",
+              active ? "text-[#ed1c24]" : "text-slate-400"
+            )}>
+              {code}
+            </span>
+            <item.icon className={cn(
+              "h-4 w-4",
+              active ? "text-[#ed1c24]" : "text-slate-500"
+            )} strokeWidth={2} />
+            <span className={cn(
+              "text-[13px] font-semibold tracking-tight",
+              active ? "text-[#ed1c24]" : "text-slate-700"
+            )}>
+              {item.label}
+            </span>
+          </Link>
+        );
+      })}
 
       {feedbackAllowed.includes(userRole) && (
-        <div className="mt-2">
+        <>
           <button
             onClick={() => setFeedbackOpen(!feedbackOpen)}
             className={cn(
-              "flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-all text-blue-100 hover:bg-white/10",
-              feedbackRoutes.includes(pathname) && "bg-white/5"
+              "relative flex items-center gap-4 px-6 py-4 transition-colors border-l-2 w-full text-left",
+              feedbackRoutes.includes(pathname)
+                ? "border-[#ed1c24] bg-[#ed1c24]/[0.06]"
+                : "border-transparent hover:bg-slate-50"
             )}
           >
-            <span className="flex items-center gap-3">
-              <InboxStackIcon className="h-5 w-5" /> Feedback
+            <span className={cn(
+              "dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em]",
+              feedbackRoutes.includes(pathname) ? "text-[#ed1c24]" : "text-slate-400"
+            )}>
+              {String(menu.length + 1).padStart(2, '0')}
             </span>
-            <ChevronDownIcon className={cn("h-4 w-4 transition-transform", feedbackOpen && "rotate-180")} />
+            <InboxStackIcon className={cn(
+              "h-4 w-4",
+              feedbackRoutes.includes(pathname) ? "text-[#ed1c24]" : "text-slate-500"
+            )} strokeWidth={2} />
+            <span className={cn(
+              "text-[13px] font-semibold tracking-tight flex-1",
+              feedbackRoutes.includes(pathname) ? "text-[#ed1c24]" : "text-slate-700"
+            )}>
+              Feedback
+            </span>
+            <ChevronDownIcon
+              className={cn("h-3.5 w-3.5 text-slate-400 transition-transform", feedbackOpen && "rotate-180")}
+              strokeWidth={2}
+            />
           </button>
-          
+
           {feedbackOpen && (
-            <div className="mt-1 ml-4 flex flex-col gap-1 border-l border-white/10 pl-4">
-              <Link href="/dashboard/feedback" onClick={onNavigate} className="py-2 text-sm text-blue-200 hover:text-white">Antrian Feedback</Link>
-              <Link href="/dashboard/bookmarks" onClick={onNavigate} className="py-2 text-sm text-blue-200 hover:text-white">Bookmark</Link>
-              <Link href="/dashboard/archive" onClick={onNavigate} className="py-2 text-sm text-blue-200 hover:text-white">Arsip</Link>
+            <div className="bg-slate-50/50 border-l-2 border-slate-100">
+              {[
+                { href: '/dashboard/feedback', label: 'Antrian Feedback' },
+                { href: '/dashboard/bookmarks', label: 'Bookmark' },
+                { href: '/dashboard/archive', label: 'Arsip' },
+              ].map((sub) => (
+                <Link
+                  key={sub.href}
+                  href={sub.href}
+                  onClick={onNavigate}
+                  className={cn(
+                    "block pl-[68px] pr-6 py-3 text-[12.5px] font-semibold transition-colors",
+                    pathname === sub.href
+                      ? "text-[#ed1c24]"
+                      : "text-slate-500 hover:text-slate-900"
+                  )}
+                >
+                  {sub.label}
+                </Link>
+              ))}
             </div>
           )}
-        </div>
+        </>
       )}
     </nav>
-  );
-}
-
-function NavListItem({ title, children, href, icon: Icon }) {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          href={href}
-          className="block select-none rounded-lg p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50"
-        >
-          <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-            <Icon className="h-4 w-4 text-blue-600" />
-            {title}
-          </div>
-          <p className="mt-1 line-clamp-2 text-xs leading-snug text-slate-500">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
   );
 }

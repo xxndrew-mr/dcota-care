@@ -73,7 +73,7 @@ export default function ArchivePage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-10 text-slate-500 text-sm">
-        <span className="h-5 w-5 rounded-full border-[2px] border-slate-300 border-t-indigo-500 animate-spin mr-2"></span>
+        <span className="h-5 w-5 rounded-full border-[2px] border-slate-300 border-t-[#ed781e] animate-spin mr-2"></span>
         Memuat arsip...
       </div>
     );
@@ -82,7 +82,7 @@ export default function ArchivePage() {
   return (
     <div className="px-4 py-6">
       {/* HEADER */}
-      <div className="relative mb-8 rounded-3xl bg-blue-800 px-6 py-6 shadow-lg overflow-hidden">
+      <div className="relative mb-8 rounded-3xl bg-gradient-to-br from-[#5c1602] via-[#dc2626] to-[#ed781e] px-6 py-6 shadow-lg overflow-hidden">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="flex items-center gap-3 text-2xl font-semibold text-white">
@@ -91,7 +91,7 @@ export default function ArchivePage() {
               </span>
               Arsip Saya
             </h1>
-            <p className="mt-1 text-sm text-indigo-100">
+            <p className="mt-1 text-sm text-orange-100">
               Daftar feedback yang Anda arsipkan secara pribadi.
             </p>
           </div>

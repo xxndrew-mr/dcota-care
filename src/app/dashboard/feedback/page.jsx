@@ -122,7 +122,7 @@ export default function FeedbackQueuePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-700">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-950 p-8 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#5c1602] via-[#dc2626] to-[#ed781e] p-8 text-white shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-blue-200 mb-2">

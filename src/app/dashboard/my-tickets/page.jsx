@@ -5,165 +5,298 @@ import {
   PaperClipIcon,
   MagnifyingGlassIcon,
   CalendarIcon,
-  ArrowPathIcon,
   ChevronDownIcon,
-  UserIcon,
-  BuildingStorefrontIcon,
-  PhoneIcon,
-  TagIcon,
   XMarkIcon,
-  ShieldCheckIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
-import { History, Ticket } from 'lucide-react';
+import { Ticket } from 'lucide-react';
 
-// ─── Status styling ───────────────────────────────────────────────────────────
-const STATUS_STYLES = {
-  Open:     'bg-blue-50   text-blue-700   border-blue-200   ring-blue-600/10',
-  Pending:  'bg-amber-50  text-amber-700  border-amber-200  ring-amber-600/10',
-  Done:     'bg-emerald-50 text-emerald-700 border-emerald-200 ring-emerald-600/10',
-  Rejected: 'bg-rose-50   text-rose-700   border-rose-200   ring-rose-600/10',
+/* ─────────────────────────────────────────────
+   STATUS CONFIG — palet Dcota
+   (warna status = makna fungsional, dipertahankan)
+───────────────────────────────────────────── */
+const STATUS_CONFIG = {
+  Open: {
+    label: 'Open',
+    textClass: 'text-slate-900',
+    bgClass: 'bg-slate-100 border-slate-300',
+    borderClass: 'border-l-slate-400',
+    dotClass: 'bg-slate-500',
+  },
+  Pending: {
+    label: 'Pending',
+    textClass: 'text-[#ed1c24]',
+    bgClass: 'bg-[#ed1c24]/[0.05] border-[#ed1c24]/30',
+    borderClass: 'border-l-[#ed1c24]',
+    dotClass: 'bg-[#ed1c24]',
+  },
+  Done: {
+    label: 'Done',
+    textClass: 'text-emerald-700',
+    bgClass: 'bg-emerald-50 border-emerald-200',
+    borderClass: 'border-l-emerald-500',
+    dotClass: 'bg-emerald-500',
+  },
+  Rejected: {
+    label: 'Rejected',
+    textClass: 'text-slate-700',
+    bgClass: 'bg-slate-100 border-slate-300',
+    borderClass: 'border-l-slate-700',
+    dotClass: 'bg-slate-700',
+  },
 };
 
-const STATUS_DOT = {
-  Open:     'bg-blue-500',
-  Pending:  'bg-amber-500',
-  Done:     'bg-emerald-500',
-  Rejected: 'bg-rose-500',
+const getStatusConfig = (status) =>
+  STATUS_CONFIG[status] || {
+    label: status,
+    textClass: 'text-slate-700',
+    bgClass: 'bg-slate-100 border-slate-200',
+    borderClass: 'border-l-slate-300',
+    dotClass: 'bg-slate-400',
+  };
+
+/* ─────────────────────────────────────────────
+   STATUS BADGE
+───────────────────────────────────────────── */
+const StatusBadge = ({ status }) => {
+  const cfg = getStatusConfig(status);
+  return (
+    <span className={`inline-flex items-center gap-1.5 border px-2 py-1 text-[9.5px] font-bold uppercase tracking-[0.14em] dcota-mono ${cfg.bgClass} ${cfg.textClass}`}>
+      <span className={`inline-block w-1.5 h-1.5 ${cfg.dotClass}`} />
+      {cfg.label}
+    </span>
+  );
 };
 
-const getStatusStyle = (status) =>
-  STATUS_STYLES[status] ?? 'bg-slate-50 text-slate-700 border-slate-200 ring-slate-500/10';
-
-const getStatusDot = (status) =>
-  STATUS_DOT[status] ?? 'bg-slate-400';
-
-// ─── Small reusable components ────────────────────────────────────────────────
-const StatusBadge = ({ status }) => (
-  <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(status)}`}>
-    <span className={`h-1.5 w-1.5 rounded-full ${getStatusDot(status)}`} />
-    {status}
-  </span>
-);
-
-const InfoCell = ({ icon: Icon, label, value }) => (
-  <div className="space-y-0.5">
-    <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-      <Icon className="h-3 w-3" /> {label}
+/* ─────────────────────────────────────────────
+   INFO CELL
+───────────────────────────────────────────── */
+const InfoCell = ({ label, value, code }) => (
+  <div className="min-w-0">
+    <div className="flex items-baseline gap-2 mb-1">
+      {code && (
+        <span className="dcota-mono text-[9px] font-bold uppercase tracking-[0.18em] text-slate-300">
+          {code}
+        </span>
+      )}
+      <p className="dcota-mono text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500">
+        {label}
+      </p>
+    </div>
+    <p className="text-[12.5px] font-bold text-slate-900 truncate">
+      {value || <span className="text-slate-300">—</span>}
     </p>
-    <p className="text-xs font-semibold text-slate-700 truncate">{value || '—'}</p>
   </div>
 );
 
+/* ─────────────────────────────────────────────
+   SKELETON
+───────────────────────────────────────────── */
 const SkeletonCard = () => (
-  <div className="animate-pulse rounded-2xl border border-slate-100 bg-white overflow-hidden">
-    <div className="p-5 space-y-3">
-      <div className="h-5 w-20 rounded-full bg-slate-200" />
-      <div className="h-4 w-3/4 rounded bg-slate-200" />
-      <div className="h-3 w-1/2 rounded bg-slate-100" />
+  <div className="animate-pulse border border-slate-200 border-l-[6px] border-l-slate-200 bg-white">
+    <div className="px-5 py-4 border-b border-slate-100">
+      <div className="h-5 w-20 bg-slate-200 mb-3" />
+      <div className="h-5 w-3/4 bg-slate-200 mb-2" />
+      <div className="h-3 w-1/2 bg-slate-100" />
     </div>
-    <div className="px-5 pb-5 space-y-2">
-      <div className="h-16 w-full rounded-xl bg-slate-100" />
-      <div className="h-10 w-full rounded-xl bg-slate-50" />
+    <div className="px-5 py-4 bg-slate-50/40 space-y-3">
+      <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-1.5"><div className="h-2 w-12 bg-slate-200" /><div className="h-3 w-16 bg-slate-100" /></div>
+        <div className="space-y-1.5"><div className="h-2 w-12 bg-slate-200" /><div className="h-3 w-16 bg-slate-100" /></div>
+        <div className="space-y-1.5"><div className="h-2 w-12 bg-slate-200" /><div className="h-3 w-16 bg-slate-100" /></div>
+      </div>
+      <div className="border border-slate-200 bg-white p-4 space-y-2">
+        <div className="h-2 w-20 bg-slate-200" />
+        <div className="h-3 w-full bg-slate-100" />
+        <div className="h-3 w-4/5 bg-slate-100" />
+      </div>
     </div>
   </div>
 );
 
-// ─── Ticket Card ──────────────────────────────────────────────────────────────
-const TicketCard = ({ ticket }) => (
-  <div className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-900/5">
+/* ═════════════════════════════════════════════
+   TICKET CARD
+═════════════════════════════════════════════ */
+const TicketCard = ({ ticket, idx }) => {
+  const cfg = getStatusConfig(ticket.status);
+  const rowNum = String(idx + 1).padStart(3, '0');
 
-    {/* Header */}
-    <div className="p-5 border-b border-slate-100">
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1.5 min-w-0">
-          <StatusBadge status={ticket.status} />
-          <h2 className="text-sm font-bold text-slate-900 line-clamp-2 group-hover:text-blue-700 transition-colors leading-snug">
-            {ticket.title}
-          </h2>
-          <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400">
-            <span className="font-bold text-blue-600">{ticket.ticket_id}</span>
-            <span>·</span>
-            <span>
-              {new Date(ticket.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+  return (
+    <article
+      className={`bg-white border border-slate-200 border-l-[6px] ${cfg.borderClass} transition-all duration-200 hover:border-[#ed1c24] hover:shadow-[0_8px_24px_-16px_rgba(15,23,42,0.18)]`}
+      style={{ animation: 'fadeUp 0.4s ease both' }}
+    >
+      {/* ─── HEADER STRIP ─── */}
+      <header className="px-4 sm:px-5 py-4 border-b border-slate-100 bg-slate-50/40">
+        <div className="flex items-start justify-between gap-3 mb-2">
+          {/* Left: row number + ticket id */}
+          <div className="flex items-baseline gap-3 min-w-0 flex-1">
+            <span className="dcota-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300 shrink-0">
+              {rowNum}
+            </span>
+            <span className="dcota-mono text-[10px] font-bold uppercase tracking-[0.16em] bg-[#ed1c24] text-white px-2 py-0.5 shrink-0">
+              #{ticket.ticket_id}
             </span>
           </div>
+          {/* Right: status */}
+          <StatusBadge status={ticket.status} />
         </div>
-      </div>
-    </div>
 
-    {/* Body */}
-    <div className="flex-1 space-y-4 bg-slate-50/40 p-5">
-      <div className="grid grid-cols-3 gap-3">
-        <InfoCell icon={UserIcon}             label="Pelapor"   value={ticket.nama_pengisi} />
-        <InfoCell icon={BuildingStorefrontIcon} label="Toko"    value={ticket.toko} />
-        <InfoCell icon={PhoneIcon}            label="WhatsApp"  value={ticket.no_telepon} />
-      </div>
+        {/* Title */}
+        <h2 className="text-[15px] sm:text-base font-extrabold tracking-tight text-slate-900 leading-snug line-clamp-2 mb-2">
+          {ticket.title}
+        </h2>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Detail Permintaan</p>
-        <p className="text-xs leading-relaxed text-slate-600">
-          {ticket.detail?.description || 'Tidak ada deskripsi tambahan.'}
-        </p>
+        {/* Meta line */}
+        <div className="flex items-center flex-wrap gap-x-3 gap-y-1 dcota-mono text-[10px] uppercase tracking-[0.14em] text-slate-400">
+          <span>
+            {new Date(ticket.createdAt).toLocaleDateString('id-ID', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            })}
+          </span>
+          <span className="text-slate-300">·</span>
+          <span>
+            {new Date(ticket.createdAt).toLocaleTimeString('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+          {ticket.kategori && (
+            <>
+              <span className="text-slate-300">·</span>
+              <span className="text-slate-900 font-bold">{ticket.kategori}</span>
+            </>
+          )}
+        </div>
+      </header>
 
+      {/* ─── BODY ─── */}
+      <div className="px-4 sm:px-5 py-5 space-y-5">
+
+        {/* Info grid — STACKED di mobile, 3 cols di sm+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <InfoCell code="01" label="Pelapor" value={ticket.nama_pengisi} />
+          <InfoCell code="02" label="Toko" value={ticket.toko} />
+          <InfoCell code="03" label="WhatsApp" value={ticket.no_telepon} />
+        </div>
+
+        {/* Deskripsi block */}
+        <div>
+          <div className="flex items-baseline gap-2 mb-2">
+            <span className="dcota-mono text-[9px] font-bold uppercase tracking-[0.18em] text-slate-300">
+              04
+            </span>
+            <p className="dcota-mono text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500">
+              Detail Permintaan
+            </p>
+          </div>
+          <div className="border-l-2 border-[#ed1c24]/40 pl-3">
+            <p className="text-[12.5px] text-slate-700 leading-relaxed whitespace-pre-line">
+              {ticket.detail?.description || (
+                <span className="italic text-slate-400">Tidak ada deskripsi tambahan.</span>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Attachments */}
         {ticket.detail?.attachments_json?.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5 border-t border-slate-100 pt-3">
-            {ticket.detail.attachments_json.map((f, idx) => (
-              <a
-                key={idx}
-                href={f.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/10 transition-colors hover:bg-blue-100"
-              >
-                <PaperClipIcon className="h-3 w-3 shrink-0" />
-                <span className="max-w-[100px] truncate">{f.name}</span>
-              </a>
-            ))}
+          <div>
+            <div className="flex items-baseline gap-2 mb-2">
+              <span className="dcota-mono text-[9px] font-bold uppercase tracking-[0.18em] text-slate-300">
+                05
+              </span>
+              <p className="dcota-mono text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                Lampiran ({ticket.detail.attachments_json.length})
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {ticket.detail.attachments_json.map((f, idx) => (
+                <a
+                  key={idx}
+                  href={f.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="dcota-mono flex items-center gap-1.5 border border-slate-300 hover:border-[#ed1c24] hover:text-[#ed1c24] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-700 transition-colors"
+                >
+                  <PaperClipIcon className="h-3 w-3 shrink-0" strokeWidth={2} />
+                  <span className="max-w-[120px] truncate normal-case tracking-normal font-semibold">
+                    {f.name}
+                  </span>
+                </a>
+              ))}
+            </div>
           </div>
         )}
       </div>
-    </div>
 
-    {/* Footer: Activity log */}
-    {ticket.logs?.length > 0 && (
-      <div className="border-t border-slate-100 bg-white px-5 py-3.5">
-        <details className="group/details">
-          <summary className="flex cursor-pointer list-none items-center justify-between text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors select-none">
-            <span>Riwayat Aktivitas ({ticket.logs.length})</span>
-            <ChevronDownIcon className="h-3.5 w-3.5 transition-transform group-open/details:rotate-180" />
+      {/* ─── ACTIVITY LOG ─── */}
+      {ticket.logs?.length > 0 && (
+        <details className="group/details border-t border-slate-200">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-4 sm:px-5 py-3.5 hover:bg-[#ed1c24]/[0.03] transition-colors select-none">
+            <div className="flex items-baseline gap-3">
+              <span className="dcota-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[#ed1c24]">
+                LOG
+              </span>
+              <span className="dcota-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">
+                Riwayat Aktivitas ({ticket.logs.length})
+              </span>
+            </div>
+            <ChevronDownIcon
+              className="h-4 w-4 text-slate-400 transition-transform group-open/details:rotate-180"
+              strokeWidth={2}
+            />
           </summary>
 
-          <div className="mt-3 max-h-44 space-y-3 overflow-y-auto pr-1 pb-1">
-            {ticket.logs.map((log) => (
-              <div key={log.log_id} className="relative pl-4 border-l-2 border-slate-100">
-                <span className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white" />
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-[11px] font-bold text-slate-800">{log.actor.name}</p>
-                  <span className="rounded-md bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-blue-600 tracking-wide">
-                    {log.action_type}
-                  </span>
+          <div className="px-4 sm:px-5 pb-5 max-h-[300px] overflow-y-auto">
+            <div className="space-y-4 pt-2">
+              {ticket.logs.map((log, lIdx) => (
+                <div key={log.log_id} className="relative pl-5 border-l-2 border-slate-200">
+                  <span className="absolute -left-[5px] top-1 h-2 w-2 bg-[#ed1c24] ring-2 ring-white" />
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <p className="text-[12px] font-extrabold text-slate-900 truncate">
+                      {log.actor.name}
+                    </p>
+                    <span className="dcota-mono text-[9px] font-bold uppercase tracking-[0.14em] bg-slate-900 text-white px-1.5 py-0.5 shrink-0">
+                      {log.action_type}
+                    </span>
+                  </div>
+                  {log.notes && (
+                    <p className="text-[11.5px] text-slate-600 leading-relaxed mb-1">
+                      {log.notes}
+                    </p>
+                  )}
+                  <p className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                    {new Date(log.timestamp).toLocaleString('id-ID', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
                 </div>
-                {log.notes && <p className="mt-0.5 text-[11px] text-slate-500 leading-snug">{log.notes}</p>}
-                <p className="mt-1 text-[9px] font-medium uppercase tracking-wider text-slate-300">
-                  {new Date(log.timestamp).toLocaleString('id-ID')}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </details>
-      </div>
-    )}
-  </div>
-);
+      )}
+    </article>
+  );
+};
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+/* ═════════════════════════════════════════════
+   MAIN PAGE
+═════════════════════════════════════════════ */
 export default function MyTicketsPage() {
-  const [tickets,          setTickets]          = useState([]);
-  const [isLoading,        setIsLoading]        = useState(true);
-  const [error,            setError]            = useState(null);
-  const [selectedMonth,    setSelectedMonth]    = useState('');
+  const [tickets, setTickets] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [searchQuery,      setSearchQuery]      = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const loadHistory = async () => {
     setError(null);
@@ -196,161 +329,260 @@ export default function MyTicketsPage() {
     }
     if (selectedCategory && ticket.kategori !== selectedCategory) return false;
     if (searchQuery.trim()) {
-      const q        = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase();
       const haystack = `${ticket.title} ${ticket.detail?.description ?? ''} ${ticket.nama_pengisi ?? ''} ${ticket.toko ?? ''} ${ticket.kategori ?? ''} ${ticket.status ?? ''}`.toLowerCase();
       if (!haystack.includes(q)) return false;
     }
     return true;
   });
 
-  const hasFilters  = selectedMonth || selectedCategory || searchQuery;
-  const clearFilter = () => { setSelectedMonth(''); setSelectedCategory(''); setSearchQuery(''); };
+  const hasFilters = selectedMonth || selectedCategory || searchQuery;
+  const clearFilter = () => {
+    setSelectedMonth('');
+    setSelectedCategory('');
+    setSearchQuery('');
+  };
 
-  const doneCount     = tickets.filter((t) => t.status === 'Done').length;
-  const pendingCount  = tickets.filter((t) => t.status === 'Pending' || t.status === 'Open').length;
+  const doneCount = tickets.filter((t) => t.status === 'Done').length;
+  const pendingCount = tickets.filter((t) => t.status === 'Pending' || t.status === 'Open').length;
+  const rejectedCount = tickets.filter((t) => t.status === 'Rejected').length;
 
   return (
-    <div className="min-h-screen bg-slate-50/60">
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#0d2444] via-[#133567] to-[#0a3d62] px-6 py-8 text-white">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-blue-400/10 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full bg-sky-300/10 blur-2xl" />
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-        <div className="relative mx-auto max-w-7xl">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-blue-300/60 mb-1">
-                <ShieldCheckIcon className="h-4 w-4" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Onda Care · Workspace</span>
-              </div>
-              <h1 className="text-2xl font-black tracking-tight">Riwayat Request Saya</h1>
-              <p className="text-sm text-blue-100/60 max-w-md">
-                Pantau status laporan dan tinjau kembali data yang telah Anda kirimkan.
-              </p>
+      <div className="dcota-sans bg-slate-50/60 animate-in fade-in duration-500 min-h-screen pb-12">
+
+        {/* ═══════════════════════════════════════════════════════
+            HEADER
+        ═══════════════════════════════════════════════════════ */}
+        <section className="border-b border-slate-200 border-t-[3px] border-t-[#ed1c24] bg-white">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12 pt-8 sm:pt-12 pb-6 sm:pb-10">
+
+            {/* Breadcrumb */}
+            <div className="dcota-mono text-[9.5px] sm:text-[10.5px] uppercase tracking-[0.22em] text-slate-400 mb-4 sm:mb-5 flex items-center flex-wrap gap-2 sm:gap-3">
+              <span className="bg-[#ed1c24] text-white px-2 py-1 font-semibold tracking-[0.2em]">MY TICKETS</span>
+              <span className="text-slate-900 font-semibold">DCOTA CARE</span>
+              <span className="text-slate-300">/</span>
+              <span>HISTORY</span>
             </div>
 
-            {/* Stat chips */}
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <div className="flex items-center gap-2.5 rounded-xl bg-white/10 border border-white/10 px-4 py-2.5">
-                <Ticket className="h-4 w-4 text-blue-200" />
-                <div>
-                  <p className="text-[10px] text-blue-200/60 font-medium uppercase tracking-wide leading-none">Total</p>
-                  <p className="text-lg font-black leading-tight">{tickets.length}</p>
-                </div>
+            <div className="grid grid-cols-12 gap-4 sm:gap-6 items-end">
+              {/* Headline */}
+              <div className="col-span-12 lg:col-span-7">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[0.95]">
+                  Riwayat <span className="text-[#ed1c24]">Laporan.</span>
+                </h1>
+                <p className="text-[12.5px] sm:text-sm text-slate-500 mt-3 sm:mt-4 max-w-md leading-relaxed">
+                  Pantau status laporan dan tinjau kembali data yang telah Anda kirimkan.
+                </p>
               </div>
-              <div className="flex items-center gap-2.5 rounded-xl bg-emerald-400/10 border border-emerald-400/20 px-4 py-2.5">
-                <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                <div>
-                  <p className="text-[10px] text-emerald-200/60 font-medium uppercase tracking-wide leading-none">Selesai</p>
-                  <p className="text-lg font-black text-emerald-300 leading-tight">{doneCount}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5 rounded-xl bg-amber-400/10 border border-amber-400/20 px-4 py-2.5">
-                <div className="h-2 w-2 rounded-full bg-amber-400" />
-                <div>
-                  <p className="text-[10px] text-amber-200/60 font-medium uppercase tracking-wide leading-none">Proses</p>
-                  <p className="text-lg font-black text-amber-300 leading-tight">{pendingCount}</p>
-                </div>
+
+              {/* Stats — 3 cols always (small but readable) */}
+              <div className="col-span-12 lg:col-span-5 grid grid-cols-3 gap-0 border-t lg:border-t-0 lg:border-l border-slate-200 pt-4 lg:pt-0">
+                <StatBlock label="Total" value={tickets.length} code="01" />
+                <StatBlock label="Selesai" value={doneCount} code="02" success />
+                <StatBlock label="Proses" value={pendingCount} code="03" accent />
               </div>
             </div>
+
+            {/* Actions row */}
+            <div className="mt-6 sm:mt-10 flex flex-wrap items-center gap-2">
+              <button
+                onClick={loadHistory}
+                className="dcota-mono flex items-center gap-2 bg-[#ed1c24] hover:bg-[#c8131a] text-white px-4 sm:px-5 py-2.5 sm:py-3 text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[0.14em] transition-colors"
+              >
+                <ArrowPathIcon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isLoading ? 'animate-spin' : ''}`} strokeWidth={2} />
+                Refresh
+              </button>
+              {rejectedCount > 0 && (
+                <div className="dcota-mono text-[10px] uppercase tracking-[0.16em] text-slate-400 ml-auto">
+                  <span>Rejected:</span>
+                  <span className="text-slate-900 font-bold ml-1.5">{rejectedCount}</span>
+                </div>
+              )}
+            </div>
+
           </div>
-        </div>
-      </div>
+        </section>
 
-      <div className="mx-auto max-w-7xl px-4 py-6 space-y-5 animate-in fade-in duration-500">
+        {/* ═══════════════════════════════════════════════════════
+            FILTER TOOLBAR — Swiss
+        ═══════════════════════════════════════════════════════ */}
+        <section className="sticky top-16 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12 py-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 
-        {/* ── Filter Bar ────────────────────────────────────────────────── */}
-        <div className="sticky top-[60px] z-30 rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-md shadow-sm">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="relative flex-1">
-              <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Cari laporan, toko, atau kata kunci..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2 pl-9 pr-4 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="relative">
-                <TagIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="appearance-none rounded-xl border border-slate-200 bg-slate-50/70 py-2 pl-9 pr-7 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white cursor-pointer"
-                >
-                  <option value="">Semua Kategori</option>
-                  {kategoriOptions.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
-                </select>
-              </div>
-
-              <div className="relative">
-                <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              {/* Search — underline only */}
+              <div className="relative flex-1">
+                <MagnifyingGlassIcon className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" strokeWidth={2} />
                 <input
-                  type="month"
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="rounded-xl border border-slate-200 bg-slate-50/70 py-2 pl-9 pr-3 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white"
+                  type="text"
+                  placeholder="Cari laporan, toko, atau kata kunci…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full border-0 border-b border-slate-200 bg-transparent pl-6 pr-4 py-2 text-[13px] font-semibold text-slate-900 placeholder-slate-300 focus:border-[#ed1c24] focus:outline-none focus:ring-0 transition-colors"
                 />
               </div>
 
-              {hasFilters && (
-                <button
-                  onClick={clearFilter}
-                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-500 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+              {/* Filter selects */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="dcota-mono text-[10px] uppercase tracking-[0.18em] text-slate-400 hidden sm:inline">
+                  Filter:
+                </span>
+
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="dcota-mono text-[11px] font-semibold uppercase tracking-[0.12em] border border-slate-200 hover:border-slate-900 bg-white px-3 py-2 text-slate-900 cursor-pointer appearance-none pr-7 transition-colors focus:outline-none focus:border-[#ed1c24]"
+                  style={{
+                    backgroundImage:
+                      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E\")",
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 0.5rem center',
+                    backgroundSize: '14px',
+                  }}
                 >
-                  <XMarkIcon className="h-3.5 w-3.5" />
-                  Reset
-                </button>
-              )}
+                  <option value="">Semua Kategori</option>
+                  {kategoriOptions.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+
+                <div className="relative">
+                  <CalendarIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" strokeWidth={2} />
+                  <input
+                    type="month"
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    className="dcota-mono text-[11px] font-semibold uppercase tracking-[0.12em] border border-slate-200 hover:border-slate-900 bg-white pl-8 pr-3 py-2 text-slate-900 transition-colors focus:outline-none focus:border-[#ed1c24]"
+                  />
+                </div>
+
+                {hasFilters && (
+                  <button
+                    onClick={clearFilter}
+                    className="dcota-mono flex items-center gap-1.5 border border-slate-200 hover:border-[#ed1c24] hover:text-[#ed1c24] px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500 transition-colors"
+                  >
+                    <XMarkIcon className="h-3.5 w-3.5" strokeWidth={2} />
+                    Reset
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* ── Error ─────────────────────────────────────────────────────── */}
+        {/* ═══════════════════════════════════════════════════════
+            ERROR BANNER
+        ═══════════════════════════════════════════════════════ */}
         {error && (
-          <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-            {error}
+          <div className="border-b border-[#ed1c24]/20 bg-[#ed1c24]/[0.04]">
+            <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12 py-4">
+              <p className="dcota-mono text-[12px] font-semibold text-[#ed1c24]">
+                {error}
+              </p>
+            </div>
           </div>
         )}
 
-        {/* ── Content ───────────────────────────────────────────────────── */}
-        {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
-          </div>
-        ) : visibleTickets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white py-20 gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
-              <Ticket className="h-7 w-7 text-slate-300" />
+        {/* ═══════════════════════════════════════════════════════
+            CONTENT
+        ═══════════════════════════════════════════════════════ */}
+        <section>
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12 py-6 sm:py-8">
+
+            {/* Section header + result count */}
+            <div className="flex items-baseline justify-between mb-5 pb-4 border-b border-slate-200">
+              <div className="flex items-baseline gap-3 sm:gap-4 min-w-0">
+                <span className="dcota-mono text-[10px] sm:text-[10.5px] uppercase tracking-[0.22em] text-[#ed1c24] font-semibold hidden sm:inline">
+                  §  Inbox
+                </span>
+                <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+                  Daftar Laporan
+                </h2>
+              </div>
+              <span className="dcota-mono text-[10px] sm:text-[10.5px] uppercase tracking-[0.22em] text-slate-400 shrink-0">
+                {String(visibleTickets.length).padStart(3, '0')} / {String(tickets.length).padStart(3, '0')}
+              </span>
             </div>
-            <div className="text-center">
-              <p className="text-sm font-semibold text-slate-600">Tidak ada request ditemukan</p>
-              <p className="text-xs text-slate-400 mt-0.5">Coba ubah kata kunci atau filter Anda.</p>
-            </div>
-            {hasFilters && (
-              <button onClick={clearFilter} className="text-xs font-bold text-blue-500 hover:underline mt-1">
-                Reset filter
-              </button>
+
+            {isLoading ? (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+              </div>
+            ) : visibleTickets.length === 0 ? (
+              <EmptyState hasFilters={hasFilters} onReset={clearFilter} />
+            ) : (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {visibleTickets.map((ticket, idx) => (
+                  <TicketCard key={ticket.ticket_id} ticket={ticket} idx={idx} />
+                ))}
+              </div>
             )}
+
           </div>
-        ) : (
-          <>
-            <p className="text-xs font-medium text-slate-400">
-              Menampilkan <span className="font-bold text-slate-600">{visibleTickets.length}</span> dari{' '}
-              <span className="font-bold text-slate-600">{tickets.length}</span> laporan
-            </p>
-            <div className="grid gap-4 md:grid-cols-2">
-              {visibleTickets.map((ticket) => (
-                <TicketCard key={ticket.ticket_id} ticket={ticket} />
-              ))}
-            </div>
-          </>
-        )}
+        </section>
+
       </div>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   STAT BLOCK
+───────────────────────────────────────────── */
+function StatBlock({ label, value, code, accent, success }) {
+  const colorClass = success
+    ? 'text-emerald-600'
+    : accent
+      ? 'text-[#ed1c24]'
+      : 'text-slate-900';
+
+  return (
+    <div className="border-r border-slate-200 last:border-r-0 pl-3 sm:pl-6 lg:pl-8 py-1">
+      <div className="dcota-mono text-[8.5px] sm:text-[9px] font-semibold uppercase tracking-[0.18em] sm:tracking-[0.22em] text-slate-400 mb-1.5 truncate">
+        {code} · {label}
+      </div>
+      <div className={`text-2xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight leading-none ${colorClass}`}>
+        {String(value).padStart(2, '0')}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────────── */
+function EmptyState({ hasFilters, onReset }) {
+  return (
+    <div className="border border-slate-200 py-16 sm:py-20 text-center">
+      <Ticket className="h-10 w-10 mx-auto mb-4 text-slate-300" strokeWidth={1.5} />
+      <p className="dcota-mono text-[11px] font-bold uppercase tracking-[0.22em] text-slate-900 mb-2">
+        No Reports Found
+      </p>
+      <p className="dcota-mono text-[10px] uppercase tracking-[0.18em] text-slate-400 mb-4">
+        {hasFilters
+          ? 'Coba ubah kata kunci atau filter'
+          : 'Belum ada laporan yang dikirim'}
+      </p>
+      {hasFilters && (
+        <button
+          onClick={onReset}
+          className="dcota-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#ed1c24] hover:underline"
+        >
+          → Reset Filter
+        </button>
+      )}
     </div>
   );
 }

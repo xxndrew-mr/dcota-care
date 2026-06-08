@@ -4,35 +4,18 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 import {
-  LayoutDashboard,
   Sparkles,
   ListChecks,
-  Info,
   ShieldCheck,
-  Zap,
   Users,
   BarChart3,
-  Settings,
   UserPlus,
   Inbox,
   ClipboardList,
   History,
   MessageSquare,
-  Database,
   ArrowUpRight,
-  Clock,
-  CheckCircle2,
 } from "lucide-react";
-
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
-
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -40,9 +23,9 @@ export default function DashboardPage() {
   if (!session || !session.user) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-        <p className="text-sm font-medium text-slate-500">
-          Memuat data pengguna...
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#ed1c24] border-t-transparent" />
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-slate-400 dcota-mono">
+          Loading session
         </p>
       </div>
     );
@@ -66,21 +49,17 @@ export default function DashboardPage() {
       return [
         {
           href: "/dashboard/admin/users",
+          code: "01",
           title: "User Management",
-          desc: "Kelola akses, role, dan akun karyawan",
+          desc: "Kelola akses, role, dan akun karyawan.",
           icon: Users,
-          accent: "bg-blue-500",
-          lightAccent: "bg-blue-50",
-          textColor: "text-blue-600",
         },
         {
           href: "/dashboard/admin/analytics",
+          code: "02",
           title: "Data Warehouse",
-          desc: "Monitoring data BigQuery real-time",
+          desc: "Monitoring data BigQuery real-time.",
           icon: BarChart3,
-          accent: "bg-indigo-500",
-          lightAccent: "bg-indigo-50",
-          textColor: "text-indigo-600",
         },
       ];
     }
@@ -89,21 +68,17 @@ export default function DashboardPage() {
       return [
         {
           href: "/dashboard/submit",
+          code: "01",
           title: "Isi Formulir",
-          desc: "Laporan barang & kendala toko",
+          desc: "Laporan barang & kendala toko.",
           icon: Sparkles,
-          accent: "bg-blue-500",
-          lightAccent: "bg-blue-50",
-          textColor: "text-blue-600",
         },
         {
           href: "/dashboard/my-tickets",
+          code: "02",
           title: "Status Laporan",
-          desc: "Pantau progres secara real-time",
+          desc: "Pantau progres secara real-time.",
           icon: ListChecks,
-          accent: "bg-emerald-500",
-          lightAccent: "bg-emerald-50",
-          textColor: "text-emerald-600",
         },
       ];
     }
@@ -112,21 +87,17 @@ export default function DashboardPage() {
       return [
         {
           href: "/dashboard/queue",
+          code: "01",
           title: "Antrian Triase",
-          desc: "Tindak lanjuti laporan lapangan",
+          desc: "Tindak lanjuti laporan lapangan.",
           icon: ClipboardList,
-          accent: "bg-amber-500",
-          lightAccent: "bg-amber-50",
-          textColor: "text-amber-600",
         },
         {
           href: "/dashboard/history",
+          code: "02",
           title: "Riwayat Saya",
-          desc: "Aksi penanganan yang selesai",
+          desc: "Aksi penanganan yang selesai.",
           icon: History,
-          accent: "bg-blue-500",
-          lightAccent: "bg-blue-50",
-          textColor: "text-blue-600",
         },
       ];
     }
@@ -135,30 +106,24 @@ export default function DashboardPage() {
       return [
         {
           href: "/dashboard/queue",
+          code: "01",
           title: "Antrian Tugas",
-          desc: "Kelola tugas antrian divisi",
+          desc: "Kelola tugas antrian divisi.",
           icon: Inbox,
-          accent: "bg-indigo-500",
-          lightAccent: "bg-indigo-50",
-          textColor: "text-indigo-600",
         },
         {
           href: "/dashboard/history",
+          code: "02",
           title: "Riwayat Penanganan",
-          desc: "Tinjau performa tugas selesai",
+          desc: "Tinjau performa tugas selesai.",
           icon: History,
-          accent: "bg-blue-500",
-          lightAccent: "bg-blue-50",
-          textColor: "text-blue-600",
         },
         {
           href: "/dashboard/feedback",
+          code: "03",
           title: "Analisis Feedback",
-          desc: "Evaluasi kualitas layanan",
+          desc: "Evaluasi kualitas layanan.",
           icon: MessageSquare,
-          accent: "bg-rose-500",
-          lightAccent: "bg-rose-50",
-          textColor: "text-rose-600",
         },
       ];
     }
@@ -166,148 +131,325 @@ export default function DashboardPage() {
   };
 
   const menuCards = getMenuCards();
+  const firstName = user.name?.split(" ")[0] || "User";
+
+  const now = new Date();
+  const dateStr = now
+    .toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+    .toUpperCase();
 
   return (
-    <div className="w-full space-y-10 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* ================= HERO (Sama untuk semua role termasuk Admin) ================= */}
-      <section className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[300px] overflow-hidden text-white shadow-inner">
-        <div className="absolute inset-0 bg-cover bg-center animate-[slideBg_12s_linear_infinite]" style={{ backgroundImage: "url('/bg3.jpg')" }} />
-        <div className="absolute inset-0 bg-cover bg-center animate-[slideBg_12s_linear_infinite]" style={{ backgroundImage: "url('/bg2.jpg')", animationDelay: "4s" }} />
-        <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px]" />
-        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12 h-full flex items-center">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-extrabold tracking-tight">
-              Halo, <span className="text-blue-400">{user.name?.split(" ")[0]}</span> 👋
-            </h1>
-            <p className="text-blue-100/70 font-medium tracking-wide flex items-center gap-2">
-              {isAdmin ? <ShieldCheck className="h-4 w-4 fill-blue-400 text-blue-400" /> : <Zap className="h-4 w-4 fill-blue-400 text-blue-400" />}
-              Onda Care — <span className="text-white uppercase text-[10px] tracking-widest">{role}</span>
-            </p>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .hairline-b { border-bottom: 1px solid rgba(15,23,42,0.08); }
+        .hairline-t { border-top: 1px solid rgba(15,23,42,0.08); }
+
+        /* Headline dikecilkan sedikit agar tidak overwhelming = lebih ramah baca */
+        .display-headline {
+          font-size: clamp(48px, 8vw, 104px);
+          line-height: 0.94;
+          letter-spacing: -0.04em;
+          font-weight: 800;
+        }
+      `}</style>
+
+      <div className="dcota-sans w-full bg-white text-slate-900">
+
+        {/* ═══════════ META BAR ═══════════ */}
+        <div className="hairline-b w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+          <div className="mx-auto max-w-7xl px-6 lg:px-12 py-3 flex items-center justify-between dcota-mono text-[10.5px] uppercase tracking-[0.18em] text-slate-500">
+            <div className="flex items-center gap-6">
+              <span className="flex items-center gap-2">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                System Online
+              </span>
+              <span className="hidden md:inline">{dateStr}</span>
+            </div>
+            <div className="flex items-center gap-6">
+              <span className="hidden md:inline text-slate-400">Onda Cloud Engine</span>
+              <span>v2.4</span>
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* ================= ASYMMETRIC CONTENT SECTION ================= */}
-      <div className="bg-white -mt-12 pt-16 pb-12 rounded-t-[3.5rem] shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.08)] relative z-20">
-        <div className="mx-auto max-w-7xl px-6 lg:px-12">
+        {/* ═══════════ HERO ═══════════ */}
+        <section className="hairline-b w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+          <div className="mx-auto max-w-7xl px-6 lg:px-12 pt-16 pb-14 lg:pt-20 lg:pb-16">
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-
-            {/* KOLOM KIRI: MENU UTAMA (7/12 Ruang Desktop) */}
-            <div className="lg:col-span-7 space-y-12">
-              <div className="space-y-1">
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-                  {isAdmin ? "Manajemen Sistem" : "Layanan Utama"}
-                </h2>
-                <p className="text-sm text-slate-500 font-medium">
-                  {isAdmin ? "Kontrol penuh infrastruktur dan pengguna" : "Akses cepat modul operasional harian Anda"}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-y-10">
-                {menuCards.map((card, i) => (
-                  <Link key={i} href={card.href} className="group relative flex items-center gap-6 transition-all duration-500">
-                    <div className="relative shrink-0">
-                      <div className={`absolute inset-0 ${card.accent} opacity-0 group-hover:opacity-20 blur-2xl transition-opacity duration-500 rounded-full`} />
-                      <div className={`relative flex items-center justify-center w-16 h-16 rounded-3xl ${card.lightAccent} transition-all duration-500 group-hover:-translate-y-2 group-hover:rotate-6 group-hover:shadow-lg shadow-sm border border-white`}>
-                        <card.icon className={`h-8 w-8 ${card.textColor}`} />
-                      </div>
-                    </div>
-
-                    <div className="flex-1 space-y-1">
-                      <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
-                        {card.title}
-                      </h3>
-                      <p className="text-sm text-slate-500 leading-snug">
-                        {card.desc}
-                      </p>
-                    </div>
-
-                    <div className="p-2 rounded-full border border-slate-100 bg-slate-50 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-500">
-                      <ArrowUpRight className="h-5 w-5 text-blue-500" />
-                    </div>
-
-                    <div className="absolute -bottom-6 left-20 right-0 h-[1px] bg-slate-50 group-hover:bg-blue-50 transition-colors" />
-                  </Link>
-                ))}
+            {/* Eyebrow */}
+            <div className="grid grid-cols-12 gap-6 mb-10 lg:mb-12">
+              <div className="col-span-12 dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-400 flex flex-wrap items-center gap-3">
+                {/* tag role diberi blok merah agar dominan & jelas */}
+                <span className="bg-[#ed1c24] text-white px-2 py-1 font-semibold tracking-[0.2em]">
+                  {isAdmin ? "ADMIN" : isSalesAgen ? "FIELD" : isPIC ? "TRIAGE" : "REVIEW"}
+                </span>
+                <span className="text-slate-900 font-semibold">DCOTA CARE</span>
+                <span className="text-slate-300">/</span>
+                <span>{role}</span>
+                <span className="text-slate-300">/</span>
+                <span>SESI AKTIF</span>
               </div>
             </div>
 
-            {/* KOLOM KANAN: WIDGET & INFO (5/12 Ruang Desktop) */}
-            <div className="lg:col-span-5 space-y-10">
-              <div className="space-y-1">
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Ringkasan</h2>
-                <p className="text-sm text-blue-600 font-medium italic">Status & Aktivitas Sistem</p>
+            {/* Headline */}
+            <div className="grid grid-cols-12 gap-6 items-end">
+              <h1 className="col-span-12 lg:col-span-8 display-headline">
+                Halo,
+                <br />
+                <span className="text-[#ed1c24]">{firstName}.</span>
+              </h1>
+
+              {/* Note kanan + CTA jelas */}
+              <div className="col-span-12 lg:col-span-4 lg:pl-8 lg:border-l-2 lg:border-[#ed1c24]">
+                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.18em] text-[#ed1c24] mb-3 font-semibold">
+                  ▸ Catatan
+                </p>
+                <p className="text-[14px] leading-relaxed text-slate-700 font-medium mb-5">
+                  {isAdmin && "Kontrol penuh atas infrastruktur dan pengguna sistem."}
+                  {isSalesAgen && "Setiap laporan Anda menjadi bahan keputusan tim manajemen."}
+                  {isPIC && "Prioritaskan label urgent untuk menjaga kualitas layanan."}
+                  {isManagerPlus && "Tinjau tren feedback mingguan untuk evaluasi divisi."}
+                </p>
+                {menuCards[0] && (
+                  <Link
+                    href={menuCards[0].href}
+                    className="inline-flex items-center gap-2 bg-[#ed1c24] text-white text-[12px] font-semibold uppercase tracking-[0.15em] px-4 py-2.5 hover:bg-[#c8131a] transition-colors"
+                  >
+                    Mulai {menuCards[0].title}
+                    <ArrowUpRight className="h-4 w-4" strokeWidth={2.2} />
+                  </Link>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ═══════════ SECTION HEADER ═══════════ */}
+        <div className="hairline-b w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-slate-50/60">
+          <div className="mx-auto max-w-7xl px-6 lg:px-12 py-5 flex items-end justify-between">
+            <div className="flex items-baseline gap-4">
+              <span className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#ed1c24] font-semibold">
+                §  Section
+              </span>
+              <h2 className="text-2xl lg:text-3xl font-extrabold tracking-tight">
+                {isAdmin ? "Manajemen Sistem" : "Layanan Utama"}
+              </h2>
+            </div>
+            <div className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-400">
+              {String(menuCards.length).padStart(2, "0")} ITEM
+            </div>
+          </div>
+        </div>
+
+        {/* ═══════════ MENU GRID — baris hairline, lebih jelas bisa diklik ═══════════ */}
+        <div className="hairline-b w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+          <div className="mx-auto max-w-7xl">
+
+            {menuCards.map((card, i) => (
+              <Link
+                key={i}
+                href={card.href}
+                className={`group block px-6 lg:px-12 transition-colors duration-200 hover:bg-[#ed1c24]/[0.04] ${i < menuCards.length - 1 ? "hairline-b" : ""
+                  }`}
+              >
+                <div className="grid grid-cols-12 gap-4 lg:gap-6 py-7 lg:py-8 items-center relative">
+                  {/* bar merah penanda hover di kiri */}
+                  <span className="absolute left-0 lg:-left-12 top-1/2 -translate-y-1/2 h-10 w-1 bg-[#ed1c24] opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                  {/* Code */}
+                  <div className="col-span-2 lg:col-span-1 dcota-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-[#ed1c24]">
+                    {card.code}
+                  </div>
+
+                  {/* Icon dalam kotak — affordance lebih jelas */}
+                  <div className="col-span-2 lg:col-span-1 flex justify-start">
+                    <span className="flex items-center justify-center w-11 h-11 border border-slate-200 group-hover:border-[#ed1c24] group-hover:bg-[#ed1c24] transition-all duration-200">
+                      <card.icon
+                        className="h-5 w-5 text-slate-400 group-hover:text-white transition-colors"
+                        strokeWidth={1.6}
+                      />
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <div className="col-span-8 lg:col-span-4">
+                    <h3 className="text-xl lg:text-2xl font-extrabold tracking-tight leading-tight">
+                      <span className="relative inline-block">
+                        {card.title}
+                        <span className="absolute left-0 -bottom-0.5 w-full h-[2px] bg-[#ed1c24] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                      </span>
+                    </h3>
+                  </div>
+
+                  {/* Desc */}
+                  <div className="col-span-9 lg:col-span-4 col-start-3 lg:col-start-7">
+                    <p className="text-[14px] text-slate-600 leading-relaxed">
+                      {card.desc}
+                    </p>
+                  </div>
+
+                  {/* Arrow + label "Buka" agar jelas aksinya */}
+                  <div className="col-span-3 lg:col-span-2 flex items-center justify-end gap-2">
+                    <span className="hidden lg:inline dcota-mono text-[10.5px] uppercase tracking-[0.18em] text-slate-400 group-hover:text-[#ed1c24] transition-colors">
+                      Buka
+                    </span>
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 group-hover:border-[#ed1c24] group-hover:bg-[#ed1c24] transition-all duration-200">
+                      <ArrowUpRight
+                        className="h-4 w-4 text-slate-400 group-hover:text-white transition-colors"
+                        strokeWidth={2}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+
+          </div>
+        </div>
+
+        {/* ═══════════ BOTTOM GRID — 3 kolom ═══════════ */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+          <div className="mx-auto max-w-7xl px-6 lg:px-12 py-14 lg:py-16">
+
+            <div className="grid grid-cols-12 gap-x-6 gap-y-12">
+
+              {/* KOL 1 : SESSION */}
+              <div className="col-span-12 md:col-span-4">
+                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#ed1c24] font-semibold mb-6">
+                  ① Session
+                </p>
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center justify-center w-12 h-12 bg-[#ed1c24] text-white text-lg font-extrabold">
+                      {firstName.charAt(0).toUpperCase()}
+                    </span>
+                    <div>
+                      <p className="text-lg font-extrabold tracking-tight leading-tight">
+                        {user.name}
+                      </p>
+                      <p className="dcota-mono text-[12px] font-semibold text-slate-500">
+                        {role}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="inline-flex items-center gap-2 text-[10px] dcota-mono font-semibold uppercase tracking-[0.2em] text-emerald-700 bg-emerald-50 px-3 py-1.5 border border-emerald-200">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Authenticated
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-6">
-                {/* Widget: Welcome & Status */}
-                <div className="p-8 rounded-[2.5rem] bg-blue-50/50 border border-blue-100/50 space-y-4 relative group overflow-hidden">
-                  <div className="relative z-10 space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div className="p-3 bg-blue-600 rounded-2xl">
-                        <Clock className="h-5 w-5 text-white" />
-                      </div>
-                      <span className="text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase">Live Monitor</span>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">Pengguna Aktif</p>
-                      <h4 className="text-xl font-bold tracking-tight">{user.name}</h4>
-                    </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 w-fit px-3 py-1.5 rounded-full border border-emerald-400/20">
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      SESI TEROTENTIKASI AMAN
-                    </div>
-                  </div>
-                  <Database className="absolute -bottom-10 -right-10 h-40 w-40 opacity-[0.03] group-hover:rotate-12 transition-transform duration-700" />
-                </div>
+              {/* KOL 2 : QUICK ACTION */}
+              <div className="col-span-12 md:col-span-4">
+                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#ed1c24] font-semibold mb-6">
+                  ② {isAdmin ? "Quick Action" : "Tips Operasional"}
+                </p>
 
-                {/* Widget Khusus Admin atau Tips Operasional */}
                 {isAdmin ? (
-                  <Link href="/dashboard/admin/users" className="group block relative p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-600/20 overflow-hidden">
-                    <div className="relative z-10 space-y-6">
-                      <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl w-fit group-hover:scale-110 transition-transform duration-500">
-                        <UserPlus className="h-7 w-7" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold tracking-tight">Pintasan Admin</h3>
-                        <p className="text-blue-100/70 text-sm mt-1">Registrasi personel baru ke sistem sekarang.</p>
-                      </div>
+                  <Link
+                    href="/dashboard/admin/users"
+                    className="group block relative bg-[#ed1c24] text-white p-7 hover:bg-[#c8131a] transition-colors duration-200"
+                  >
+                    <div className="flex items-start justify-between mb-10">
+                      <UserPlus className="h-6 w-6" strokeWidth={1.5} />
+                      <span className="dcota-mono text-[10px] uppercase tracking-[0.2em] text-white/60">
+                        → ACT
+                      </span>
                     </div>
-                    <UserPlus className="absolute -bottom-6 -right-6 h-32 w-32 opacity-10 group-hover:rotate-12 transition-transform duration-700" />
+                    <h4 className="text-xl font-extrabold tracking-tight leading-tight mb-2">
+                      Registrasi<br />Personel Baru
+                    </h4>
+                    <p className="text-[12.5px] text-white/80 leading-relaxed mb-6">
+                      Tambah akun karyawan ke sistem Dcota Care.
+                    </p>
+                    <div className="dcota-mono text-[10.5px] uppercase tracking-[0.2em] flex items-center gap-2 group-hover:gap-3 transition-all">
+                      Open <ArrowUpRight className="h-3.5 w-3.5" />
+                    </div>
                   </Link>
                 ) : (
-                  <div className="p-8 rounded-[2.5rem] bg-blue-50/50 border border-blue-100/50 space-y-4 relative group overflow-hidden">
-                    <div className="flex items-center gap-3 relative z-10">
-                      <div className="p-2.5 bg-white rounded-xl shadow-sm">
-                        <Info className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <h4 className="font-bold text-slate-900">Tips Operasional</h4>
-                    </div>
-                    <p className="text-sm text-slate-600 leading-relaxed italic relative z-10">
-                      "{isSalesAgen && "Gunakan koneksi internet stabil saat mengirim laporan agar data sinkron sempurna."}
-                      {isPIC && "Prioritaskan antrian dengan label 'Urgent' untuk menjaga kualitas layanan."}
-                      {isManagerPlus && "Tinjau tren feedback mingguan untuk bahan meeting evaluasi divisi."}"
+                  <div className="relative border-l-2 border-[#ed1c24] border-t border-r border-b border-slate-200 p-7">
+                    <ShieldCheck className="h-6 w-6 text-[#ed1c24] mb-10" strokeWidth={1.5} />
+                    <p className="text-[15px] text-slate-900 font-semibold leading-snug mb-2">
+                      {isSalesAgen && "Pastikan koneksi stabil."}
+                      {isPIC && "Prioritaskan label urgent."}
+                      {isManagerPlus && "Tinjau tren mingguan."}
                     </p>
-                    <Sparkles className="absolute -bottom-4 -right-4 h-24 w-24 text-blue-200/20 group-hover:scale-110 transition-transform duration-500" />
+                    <p className="text-[12.5px] text-slate-600 leading-relaxed">
+                      {isSalesAgen && "Gunakan jaringan yang stabil saat mengirim laporan agar data tersinkronisasi sempurna ke server."}
+                      {isPIC && "Tangani antrian dengan label urgent terlebih dahulu untuk menjaga kualitas layanan kepada pelanggan."}
+                      {isManagerPlus && "Lakukan review tren feedback setiap minggu sebagai bahan evaluasi performa divisi."}
+                    </p>
                   </div>
                 )}
+              </div>
 
-                <div className="px-4 space-y-4 pt-4 text-slate-400">
-                  <div className="flex items-center gap-3">
-                    <Database className="h-4 w-4" />
-                    <span className="text-[9px] font-bold uppercase tracking-[0.4em]">Onda Cloud Engine v2.4</span>
+              {/* KOL 3 : SYSTEM */}
+              <div className="col-span-12 md:col-span-4">
+                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#ed1c24] font-semibold mb-6">
+                  ③ System
+                </p>
+                <div className="space-y-5">
+                  <div className="flex items-baseline justify-between hairline-b pb-3">
+                    <span className="dcota-mono text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                      Engine
+                    </span>
+                    <span className="dcota-mono text-[12px] font-semibold text-slate-900">
+                      Onda Cloud
+                    </span>
                   </div>
-                  <p className="text-[11px] leading-relaxed">
-                    Data Anda terenkripsi dan tersinkronisasi otomatis dengan infrastruktur BigQuery PT. Onda Mega Integra.
+                  <div className="flex items-baseline justify-between hairline-b pb-3">
+                    <span className="dcota-mono text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                      Version
+                    </span>
+                    <span className="dcota-mono text-[12px] font-semibold text-slate-900">
+                      v2.4.0
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between hairline-b pb-3">
+                    <span className="dcota-mono text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                      Backend
+                    </span>
+                    <span className="dcota-mono text-[12px] font-semibold text-slate-900">
+                      BigQuery
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between hairline-b pb-3">
+                    <span className="dcota-mono text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                      Encryption
+                    </span>
+                    <span className="dcota-mono text-[12px] font-semibold text-emerald-600">
+                      Active
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed pt-2">
+                    Data tersinkronisasi otomatis dengan infrastruktur PT. Onda Mega Integra.
                   </p>
                 </div>
               </div>
-            </div>
 
+            </div>
           </div>
         </div>
+
+        {/* ═══════════ FOOTER ═══════════ */}
+        <div className="hairline-t w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+          <div className="mx-auto max-w-7xl px-6 lg:px-12 py-5 flex items-center justify-between dcota-mono text-[10px] uppercase tracking-[0.22em] text-slate-400">
+            <span>© {now.getFullYear()} · PT Onda Mega Integra</span>
+            <span className="hidden md:inline">Dcota Care · Internal Use</span>
+          </div>
+        </div>
+
       </div>
-    </div>
+    </>
   );
 }

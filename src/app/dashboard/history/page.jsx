@@ -138,12 +138,12 @@ export default function ActionHistoryPage() {
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-700">
       
       {/* --- HERO HEADER --- */}
-      <div className="relative isolate transform-gpu overflow-hidden rounded-[32px] bg-blue-800 bg-gradient-to-br from-blue-700 to-indigo-900 p-8 text-white shadow-xl">
+      <div className="relative isolate transform-gpu overflow-hidden rounded-[32px] bg-gradient-to-br from-[#5c1602] via-[#dc2626] to-[#ed781e] p-8 text-white shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-blue-200 mb-2">
               <ClockIcon className="h-5 w-5" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Log Aktivitas Onda Care</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Log Aktivitas Dcota Care</span>
             </div>
             <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
               {isViewer ? 'Monitoring Laporan' : 'Riwayat Aksi Saya'}

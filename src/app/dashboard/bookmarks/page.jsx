@@ -72,7 +72,7 @@ export default function BookmarksPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-10 text-slate-500 text-sm">
-        <span className="inline-block h-5 w-5 animate-spin rounded-full border-[2px] border-slate-300 border-t-indigo-500 mr-2" />
+        <span className="inline-block h-5 w-5 animate-spin rounded-full border-[2px] border-slate-300 border-t-[#ed781e] mr-2" />
         Memuat bookmark...
       </div>
     );
@@ -81,7 +81,7 @@ export default function BookmarksPage() {
   return (
     <div className="px-4 py-6">
       {/* HEADER */}
-      <div className="relative mb-8 overflow-hidden rounded-3xl bg-blue-800 px-6 py-6 shadow-lg">
+      <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-[#5c1602] via-[#dc2626] to-[#ed781e] px-6 py-6 shadow-lg">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-white">
@@ -90,7 +90,7 @@ export default function BookmarksPage() {
               </span>
               Bookmark Bersama
             </h1>
-            <p className="mt-1 text-sm text-indigo-100 max-w-xl">
+            <p className="mt-1 text-sm text-orange-100 max-w-xl">
               Daftar feedback yang ditandai penting oleh tim untuk dipantau
               bersama.
             </p>
@@ -98,7 +98,7 @@ export default function BookmarksPage() {
 
           {/* Filter Bulan */}
           <div className="mt-3 sm:mt-0">
-            <div className="flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2 text-xs text-indigo-50 backdrop-blur">
+            <div className="flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2 text-xs text-orange-50 backdrop-blur">
               <CalendarDaysIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Filter bulan:</span>
               <select
