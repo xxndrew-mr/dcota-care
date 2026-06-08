@@ -17,7 +17,7 @@ export async function POST(request) {
 
     await s3Client.send(
       new PutObjectCommand({
-        Bucket: "onda-care",
+        Bucket: "dcota-care",
         Key: fileName,
         Body: buffer,
         ContentType: file.type,
@@ -25,7 +25,7 @@ export async function POST(request) {
     );
 
     // URL publik R2 (jika kamu sudah mengaktifkan Public Bucket atau Custom Domain)
-    const fileUrl = `https://care.ondasystem.work/${fileName}`;
+    const fileUrl = `https://dcota.ondasystem.work/${fileName}`;
 
     return NextResponse.json({
       success: true,
