@@ -1,10 +1,9 @@
-package main
+package handler
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -15,7 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/joho/godotenv"
 )
 
 const MaxFileSize = 100 * 1024 * 1024
@@ -28,13 +26,8 @@ type PresignRequest struct {
 
 var s3PresignClient *s3.PresignClient
 
-func initEnv() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("Peringatan: File .env tidak ditemukan, menggunakan env system")
-	}
-}
-
-func initR2() {
+// init() berjalan otomatis saat cold start di Vercel
+func init() {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithRegion("auto"),
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
@@ -44,7 +37,8 @@ func initR2() {
 		)),
 	)
 	if err != nil {
-		log.Fatalf("Gagal load config AWS: %v", err)
+		fmt.Println("Gagal load config AWS:", err)
+		return
 	}
 
 	s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
@@ -60,16 +54,8 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 	json.NewEncoder(w).Encode(map[string]string{"message": message})
 }
 
-func presignHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
+// Handler adalah fungsi utama yang dibaca oleh Vercel
+func Handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		respondWithError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan")
 		return
@@ -113,7 +99,7 @@ func presignHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		log.Println("R2 Presign Error:", err)
+		fmt.Println("R2 Presign Error:", err)
 		respondWithError(w, http.StatusInternalServerError, "Gagal membuat upload URL")
 		return
 	}
@@ -130,19 +116,4 @@ func presignHandler(w http.ResponseWriter, r *http.Request) {
 		"fileUrl":   fileUrl,
 		"key":       key,
 	})
-}
-
-func main() {
-	initEnv()
-	initR2()
-
-	http.HandleFunc("/api/upload/presign", presignHandler)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	fmt.Printf("Server Golang berjalan di port %s...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
