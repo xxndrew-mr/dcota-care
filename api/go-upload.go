@@ -42,7 +42,12 @@ func init() {
 	}
 
 	s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.BaseEndpoint = aws.String(os.Getenv("R2_ENDPOINT"))
+		// FALLBACK 1: Pastikan Endpoint R2 tidak kosong
+		endpoint := os.Getenv("R2_ENDPOINT")
+		if endpoint == "" {
+			endpoint = "https://39dc800083509340221b51e53ecca4c7.r2.cloudflarestorage.com"
+		}
+		o.BaseEndpoint = aws.String(endpoint)
 	})
 
 	s3PresignClient = s3.NewPresignClient(s3Client)
@@ -56,6 +61,17 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 
 // Handler adalah fungsi utama yang dibaca oleh Vercel
 func Handler(w http.ResponseWriter, r *http.Request) {
+	// SETUP CORS (Sangat krusial untuk Vercel Serverless)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	// Tangkap preflight request dari browser
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method != http.MethodPost {
 		respondWithError(w, http.StatusMethodNotAllowed, "Method tidak diizinkan")
 		return
@@ -90,8 +106,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	safeName := re.ReplaceAllString(req.FileName, "_")
 	key := fmt.Sprintf("attachments/%d-%s", time.Now().UnixMilli(), safeName)
 
+	// FALLBACK 2: Pastikan nama bucket tidak kosong
+	bucketName := os.Getenv("R2_BUCKET_NAME")
+	if bucketName == "" {
+		bucketName = "dcota-care"
+	}
+
 	presignReq, err := s3PresignClient.PresignPutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket:      aws.String(os.Getenv("R2_BUCKET_NAME")),
+		Bucket:      aws.String(bucketName),
 		Key:         aws.String(key),
 		ContentType: aws.String(req.FileType),
 	}, func(opts *s3.PresignOptions) {
@@ -104,8 +126,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// FALLBACK 3: Pastikan Public URL tidak kosong
 	publicBaseUrl := os.Getenv("R2_PUBLIC_URL")
-	if !strings.HasPrefix(publicBaseUrl, "http") {
+	if publicBaseUrl == "" {
+		publicBaseUrl = "https://dcota.ondasystem.work"
+	} else if !strings.HasPrefix(publicBaseUrl, "http") {
 		publicBaseUrl = "https://" + publicBaseUrl
 	}
 	fileUrl := fmt.Sprintf("%s/%s", publicBaseUrl, key)
