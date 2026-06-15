@@ -119,7 +119,11 @@ export default function SubmitTicketPage() {
     try {
       let attachments = null;
       if (file) {
-        const presignRes = await fetch('/api/upload/presign', {
+        // 1. Ambil URL Golang dari environment, fallback ke localhost:8080
+        const GOLANG_API_URL = process.env.NEXT_PUBLIC_GOLANG_API_URL || 'http://localhost:8080';
+
+        // 2. Tembak endpoint ke server Golang
+        const presignRes = await fetch(`${GOLANG_API_URL}/api/upload/presign`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

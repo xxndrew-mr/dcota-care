@@ -43,3 +43,8 @@ next-env.d.ts
 /src/generated/prisma
 service-account-key.json
 uploader-creden.json
+
+# Golang
+upload-service/.env
+upload-service/upload-service # Jika kamu build menjadi binary
+upload-service/*.exe # Jika kamu build di Windows
