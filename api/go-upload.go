@@ -26,7 +26,6 @@ type PresignRequest struct {
 
 var s3PresignClient *s3.PresignClient
 
-// init() berjalan otomatis saat cold start di Vercel
 func init() {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithRegion("auto"),
@@ -42,7 +41,6 @@ func init() {
 	}
 
 	s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		// FALLBACK 1: Pastikan Endpoint R2 tidak kosong
 		endpoint := os.Getenv("R2_ENDPOINT")
 		if endpoint == "" {
 			endpoint = "https://39dc800083509340221b51e53ecca4c7.r2.cloudflarestorage.com"
@@ -59,14 +57,11 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 	json.NewEncoder(w).Encode(map[string]string{"message": message})
 }
 
-// Handler adalah fungsi utama yang dibaca oleh Vercel
 func Handler(w http.ResponseWriter, r *http.Request) {
-	// SETUP CORS (Sangat krusial untuk Vercel Serverless)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-	// Tangkap preflight request dari browser
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -106,7 +101,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	safeName := re.ReplaceAllString(req.FileName, "_")
 	key := fmt.Sprintf("attachments/%d-%s", time.Now().UnixMilli(), safeName)
 
-	// FALLBACK 2: Pastikan nama bucket tidak kosong
 	bucketName := os.Getenv("R2_BUCKET_NAME")
 	if bucketName == "" {
 		bucketName = "dcota-care"
@@ -126,13 +120,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// FALLBACK 3: Pastikan Public URL tidak kosong
 	publicBaseUrl := os.Getenv("R2_PUBLIC_URL")
 	if publicBaseUrl == "" {
 		publicBaseUrl = "https://dcota.ondasystem.work"
 	} else if !strings.HasPrefix(publicBaseUrl, "http") {
 		publicBaseUrl = "https://" + publicBaseUrl
 	}
+
+	publicBaseUrl = strings.TrimSuffix(publicBaseUrl, "/")
 	fileUrl := fmt.Sprintf("%s/%s", publicBaseUrl, key)
 
 	w.Header().Set("Content-Type", "application/json")
