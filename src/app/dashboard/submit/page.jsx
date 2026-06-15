@@ -123,7 +123,8 @@ export default function SubmitTicketPage() {
         const GOLANG_API_URL = process.env.NEXT_PUBLIC_GOLANG_API_URL || 'http://localhost:8080';
 
         // 2. Tembak endpoint ke server Golang
-        const presignRes = await fetch('/api/upload/presign', {
+        // Ganti dari '/api/upload/presign' menjadi:
+        const presignRes = await fetch('/api/go-upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
