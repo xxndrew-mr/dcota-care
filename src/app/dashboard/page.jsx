@@ -23,7 +23,7 @@ export default function DashboardPage() {
   if (!session || !session.user) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#ed1c24] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#f26a21] border-t-transparent" />
         <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-slate-400 dcota-mono">
           Loading session
         </p>
@@ -188,8 +188,8 @@ export default function DashboardPage() {
             {/* Eyebrow */}
             <div className="grid grid-cols-12 gap-6 mb-10 lg:mb-12">
               <div className="col-span-12 dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-400 flex flex-wrap items-center gap-3">
-                {/* tag role diberi blok merah agar dominan & jelas */}
-                <span className="bg-[#ed1c24] text-white px-2 py-1 font-semibold tracking-[0.2em]">
+                {/* tag role diberi blok oranye agar dominan & jelas */}
+                <span className="bg-[#f26a21] text-white px-2 py-1 font-semibold tracking-[0.2em]">
                   {isAdmin ? "ADMIN" : isSalesAgen ? "FIELD" : isPIC ? "TRIAGE" : "REVIEW"}
                 </span>
                 <span className="text-slate-900 font-semibold">DCOTA CARE</span>
@@ -205,12 +205,12 @@ export default function DashboardPage() {
               <h1 className="col-span-12 lg:col-span-8 display-headline">
                 Halo,
                 <br />
-                <span className="text-[#ed1c24]">{firstName}.</span>
+                <span className="text-[#f26a21]">{firstName}.</span>
               </h1>
 
               {/* Note kanan + CTA jelas */}
-              <div className="col-span-12 lg:col-span-4 lg:pl-8 lg:border-l-2 lg:border-[#ed1c24]">
-                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.18em] text-[#ed1c24] mb-3 font-semibold">
+              <div className="col-span-12 lg:col-span-4 lg:pl-8 lg:border-l-2 lg:border-[#f26a21]">
+                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.18em] text-[#f26a21] mb-3 font-semibold">
                   ▸ Catatan
                 </p>
                 <p className="text-[14px] leading-relaxed text-slate-700 font-medium mb-5">
@@ -222,7 +222,7 @@ export default function DashboardPage() {
                 {menuCards[0] && (
                   <Link
                     href={menuCards[0].href}
-                    className="inline-flex items-center gap-2 bg-[#ed1c24] text-white text-[12px] font-semibold uppercase tracking-[0.15em] px-4 py-2.5 hover:bg-[#c8131a] transition-colors"
+                    className="inline-flex items-center gap-2 bg-[#f26a21] text-white text-[12px] font-semibold uppercase tracking-[0.15em] px-4 py-2.5 hover:bg-[#d4551a] transition-colors"
                   >
                     Mulai {menuCards[0].title}
                     <ArrowUpRight className="h-4 w-4" strokeWidth={2.2} />
@@ -238,7 +238,7 @@ export default function DashboardPage() {
         <div className="hairline-b w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-slate-50/60">
           <div className="mx-auto max-w-7xl px-6 lg:px-12 py-5 flex items-end justify-between">
             <div className="flex items-baseline gap-4">
-              <span className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#ed1c24] font-semibold">
+              <span className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#f26a21] font-semibold">
                 §  Section
               </span>
               <h2 className="text-2xl lg:text-3xl font-extrabold tracking-tight">
@@ -259,21 +259,21 @@ export default function DashboardPage() {
               <Link
                 key={i}
                 href={card.href}
-                className={`group block px-6 lg:px-12 transition-colors duration-200 hover:bg-[#ed1c24]/[0.04] ${i < menuCards.length - 1 ? "hairline-b" : ""
+                className={`group block px-6 lg:px-12 transition-colors duration-200 hover:bg-[#f26a21]/[0.04] ${i < menuCards.length - 1 ? "hairline-b" : ""
                   }`}
               >
                 <div className="grid grid-cols-12 gap-4 lg:gap-6 py-7 lg:py-8 items-center relative">
-                  {/* bar merah penanda hover di kiri */}
-                  <span className="absolute left-0 lg:-left-12 top-1/2 -translate-y-1/2 h-10 w-1 bg-[#ed1c24] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {/* bar oranye penanda hover di kiri */}
+                  <span className="absolute left-0 lg:-left-12 top-1/2 -translate-y-1/2 h-10 w-1 bg-[#f26a21] opacity-0 group-hover:opacity-100 transition-opacity" />
 
                   {/* Code */}
-                  <div className="col-span-2 lg:col-span-1 dcota-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-[#ed1c24]">
+                  <div className="col-span-2 lg:col-span-1 dcota-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-[#f26a21]">
                     {card.code}
                   </div>
 
                   {/* Icon dalam kotak — affordance lebih jelas */}
                   <div className="col-span-2 lg:col-span-1 flex justify-start">
-                    <span className="flex items-center justify-center w-11 h-11 border border-slate-200 group-hover:border-[#ed1c24] group-hover:bg-[#ed1c24] transition-all duration-200">
+                    <span className="flex items-center justify-center w-11 h-11 border border-slate-200 group-hover:border-[#f26a21] group-hover:bg-[#f26a21] transition-all duration-200">
                       <card.icon
                         className="h-5 w-5 text-slate-400 group-hover:text-white transition-colors"
                         strokeWidth={1.6}
@@ -286,7 +286,7 @@ export default function DashboardPage() {
                     <h3 className="text-xl lg:text-2xl font-extrabold tracking-tight leading-tight">
                       <span className="relative inline-block">
                         {card.title}
-                        <span className="absolute left-0 -bottom-0.5 w-full h-[2px] bg-[#ed1c24] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                        <span className="absolute left-0 -bottom-0.5 w-full h-[2px] bg-[#f26a21] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                       </span>
                     </h3>
                   </div>
@@ -300,10 +300,10 @@ export default function DashboardPage() {
 
                   {/* Arrow + label "Buka" agar jelas aksinya */}
                   <div className="col-span-3 lg:col-span-2 flex items-center justify-end gap-2">
-                    <span className="hidden lg:inline dcota-mono text-[10.5px] uppercase tracking-[0.18em] text-slate-400 group-hover:text-[#ed1c24] transition-colors">
+                    <span className="hidden lg:inline dcota-mono text-[10.5px] uppercase tracking-[0.18em] text-slate-400 group-hover:text-[#f26a21] transition-colors">
                       Buka
                     </span>
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 group-hover:border-[#ed1c24] group-hover:bg-[#ed1c24] transition-all duration-200">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 group-hover:border-[#f26a21] group-hover:bg-[#f26a21] transition-all duration-200">
                       <ArrowUpRight
                         className="h-4 w-4 text-slate-400 group-hover:text-white transition-colors"
                         strokeWidth={2}
@@ -325,12 +325,12 @@ export default function DashboardPage() {
 
               {/* KOL 1 : SESSION */}
               <div className="col-span-12 md:col-span-4">
-                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#ed1c24] font-semibold mb-6">
+                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#f26a21] font-semibold mb-6">
                   ① Session
                 </p>
                 <div className="space-y-6">
                   <div className="flex items-center gap-3">
-                    <span className="flex items-center justify-center w-12 h-12 bg-[#ed1c24] text-white text-lg font-extrabold">
+                    <span className="flex items-center justify-center w-12 h-12 bg-[#f26a21] text-white text-lg font-extrabold">
                       {firstName.charAt(0).toUpperCase()}
                     </span>
                     <div>
@@ -351,14 +351,14 @@ export default function DashboardPage() {
 
               {/* KOL 2 : QUICK ACTION */}
               <div className="col-span-12 md:col-span-4">
-                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#ed1c24] font-semibold mb-6">
+                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#f26a21] font-semibold mb-6">
                   ② {isAdmin ? "Quick Action" : "Tips Operasional"}
                 </p>
 
                 {isAdmin ? (
                   <Link
                     href="/dashboard/admin/users"
-                    className="group block relative bg-[#ed1c24] text-white p-7 hover:bg-[#c8131a] transition-colors duration-200"
+                    className="group block relative bg-[#f26a21] text-white p-7 hover:bg-[#d4551a] transition-colors duration-200"
                   >
                     <div className="flex items-start justify-between mb-10">
                       <UserPlus className="h-6 w-6" strokeWidth={1.5} />
@@ -377,8 +377,8 @@ export default function DashboardPage() {
                     </div>
                   </Link>
                 ) : (
-                  <div className="relative border-l-2 border-[#ed1c24] border-t border-r border-b border-slate-200 p-7">
-                    <ShieldCheck className="h-6 w-6 text-[#ed1c24] mb-10" strokeWidth={1.5} />
+                  <div className="relative border-l-2 border-[#f26a21] border-t border-r border-b border-slate-200 p-7">
+                    <ShieldCheck className="h-6 w-6 text-[#f26a21] mb-10" strokeWidth={1.5} />
                     <p className="text-[15px] text-slate-900 font-semibold leading-snug mb-2">
                       {isSalesAgen && "Pastikan koneksi stabil."}
                       {isPIC && "Prioritaskan label urgent."}
@@ -395,7 +395,7 @@ export default function DashboardPage() {
 
               {/* KOL 3 : SYSTEM */}
               <div className="col-span-12 md:col-span-4">
-                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#ed1c24] font-semibold mb-6">
+                <p className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-[#f26a21] font-semibold mb-6">
                   ③ System
                 </p>
                 <div className="space-y-5">

@@ -56,7 +56,7 @@ export default function LoginPage() {
           font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        /* ── CARD: Swiss flat, sudut tajam, hairline, strip merah atas ── */
+        /* ── CARD: Swiss flat, sudut tajam, hairline, strip oranye atas ── */
         .lp-card {
           display: flex;
           align-items: stretch;
@@ -65,7 +65,7 @@ export default function LoginPage() {
           min-height: 440px;
           background: #ffffff;
           border: 1px solid #e2e8f0;
-          border-top: 3px solid #ed1c24;
+          border-top: 3px solid #f26a21;
           box-shadow: 0 24px 60px -24px rgba(15,23,42,0.18);
           overflow: hidden;
           animation: cardIn 0.45s cubic-bezier(0.22,1,0.36,1) both;
@@ -95,7 +95,7 @@ export default function LoginPage() {
         }
         .lp-left-overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(150deg, rgba(8,24,58,0.30) 0%, rgba(8,24,58,0.20) 45%, rgba(237,28,36,0.62) 100%);
+          background: linear-gradient(150deg, rgba(8,24,58,0.30) 0%, rgba(8,24,58,0.20) 45%, rgba(242,106,33,0.62) 100%);
         }
 
         .lp-left-top {
@@ -107,8 +107,9 @@ export default function LoginPage() {
           letter-spacing: 0.22em; text-transform: uppercase; margin: 0;
           font-family: 'JetBrains Mono', monospace;
         }
+        /* logo diperbesar: badge mungil 38px → 56px, jadi focal point */
         .lp-logo-box {
-          width: 38px; height: 38px;
+          width: 56px; height: 56px;
           background: rgba(255,255,255,0.16);
           backdrop-filter: blur(12px);
           border: 1px solid rgba(255,255,255,0.30);
@@ -138,6 +139,29 @@ export default function LoginPage() {
           to   { opacity: 1; transform: translateX(0); }
         }
 
+        /* logo-lockup khusus mobile (muncul saat panel kiri disembunyikan) */
+        .lp-right-logo {
+          display: none;
+          align-items: center; gap: 12px;
+          margin: 0 0 26px;
+          padding-bottom: 22px;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .lp-right-logo-box {
+          width: 52px; height: 52px; flex-shrink: 0;
+          background: #f26a21;
+          display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .lp-right-logo-text { display: flex; flex-direction: column; line-height: 1; }
+        .lp-right-logo-name {
+          font-size: 15px; font-weight: 800; color: #0f172a; letter-spacing: -0.2px;
+        }
+        .lp-right-logo-sub {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 9px; font-weight: 700; text-transform: uppercase;
+          letter-spacing: 0.22em; color: #94a3b8; margin-top: 5px;
+        }
+
         .lp-eyebrow {
           font-family: 'JetBrains Mono', monospace;
           font-size: 10px; font-weight: 700; text-transform: uppercase;
@@ -145,14 +169,14 @@ export default function LoginPage() {
           display: flex; align-items: center; gap: 10px; margin: 0 0 18px;
         }
         .lp-eyebrow .tag {
-          background: #ed1c24; color: #fff; padding: 3px 7px; letter-spacing: 0.18em;
+          background: #f26a21; color: #fff; padding: 3px 7px; letter-spacing: 0.18em;
         }
 
         .lp-title {
           font-size: 30px; font-weight: 800; color: #0f172a;
           margin: 0 0 8px; letter-spacing: -0.8px; line-height: 1.1;
         }
-        .lp-title span { color: #ed1c24; }
+        .lp-title span { color: #f26a21; }
         .lp-desc {
           font-size: 13px; color: #64748b; margin: 0 0 26px; line-height: 1.5;
         }
@@ -166,14 +190,14 @@ export default function LoginPage() {
           display: block;
         }
 
-        /* ── INPUT: flat, sudut tajam, hairline, focus merah ── */
+        /* ── INPUT: flat, sudut tajam, hairline, focus oranye ── */
         .lp-input-wrap {
           position: relative; background: #fff;
           border: 1px solid #cbd5e1; transition: all 0.18s ease;
         }
         .lp-input-wrap:focus-within {
-          border-color: #ed1c24;
-          box-shadow: 0 0 0 3px rgba(237,28,36,0.10);
+          border-color: #f26a21;
+          box-shadow: 0 0 0 3px rgba(242,106,33,0.10);
         }
         .lp-input {
           width: 100%; height: 46px;
@@ -190,7 +214,7 @@ export default function LoginPage() {
           color: #94a3b8; display: flex; align-items: center; pointer-events: none;
           transition: color 0.18s;
         }
-        .lp-input-wrap:focus-within .lp-input-icon { color: #ed1c24; }
+        .lp-input-wrap:focus-within .lp-input-icon { color: #f26a21; }
 
         /* toggle mata kanan */
         .lp-eye {
@@ -198,7 +222,7 @@ export default function LoginPage() {
           background: none; border: none; cursor: pointer; color: #94a3b8;
           display: flex; align-items: center; padding: 4px; transition: color 0.18s; z-index: 2;
         }
-        .lp-eye:hover { color: #ed1c24; }
+        .lp-eye:hover { color: #f26a21; }
 
         .lp-error {
           display: flex; align-items: center; gap: 9px;
@@ -211,17 +235,17 @@ export default function LoginPage() {
         }
         @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* ── BUTTON: rectangular merah, uppercase mono (match app) ── */
+        /* ── BUTTON: rectangular oranye, uppercase mono (match app) ── */
         .lp-btn {
           width: 100%; height: 48px;
-          background: #ed1c24; color: #fff;
+          background: #f26a21; color: #fff;
           font-family: 'JetBrains Mono', monospace;
           font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
           border: none; cursor: pointer; margin-top: 8px;
           display: flex; align-items: center; justify-content: center; gap: 10px;
           transition: background 0.18s, transform 0.18s;
         }
-        .lp-btn:hover:not(:disabled) { background: #c8131a; }
+        .lp-btn:hover:not(:disabled) { background: #d4551a; }
         .lp-btn:active:not(:disabled) { transform: translateY(1px); }
         .lp-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
 
@@ -241,6 +265,7 @@ export default function LoginPage() {
           .lp-card { flex-direction: column; max-width: 420px; min-height: auto; }
           .lp-left { display: none; }
           .lp-right { padding: 36px 28px; }
+          .lp-right-logo { display: flex; }
           .lp-title { font-size: 27px; }
         }
       `}</style>
@@ -259,8 +284,8 @@ export default function LoginPage() {
                 <Image
                   src="/dcota-logo.png"
                   alt="Dcota Care"
-                  width={26}
-                  height={26}
+                  width={36}
+                  height={36}
                   style={{ objectFit: 'contain' }}
                   priority
                 />
@@ -277,6 +302,26 @@ export default function LoginPage() {
 
           {/* ── RIGHT PANEL ── */}
           <div className="lp-right">
+
+            {/* Logo-lockup — tampil di mobile saat panel kiri disembunyikan */}
+            <div className="lp-right-logo">
+              <div className="lp-right-logo-box">
+                <Image
+                  src="/dcota-logo.png"
+                  alt="Dcota Care"
+                  width={34}
+                  height={34}
+                  className="invert brightness-0"
+                  style={{ objectFit: 'contain' }}
+                  priority
+                />
+              </div>
+              <div className="lp-right-logo-text">
+                <span className="lp-right-logo-name">Dcota Care</span>
+                <span className="lp-right-logo-sub">Onda Grup</span>
+              </div>
+            </div>
+
             <p className="lp-eyebrow">
               <span className="tag">LOGIN</span>
               <span>Dcota Care</span>

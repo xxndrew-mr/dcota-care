@@ -53,7 +53,7 @@ export default function DashboardLayout({ children }) {
           .dcota-mono { font-family: 'JetBrains Mono', monospace; }
         `}</style>
         <div className="flex flex-col items-center gap-5">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#ed1c24] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#f26a21] border-t-transparent" />
           <p className="dcota-mono text-[10.5px] font-medium uppercase tracking-[0.22em] text-slate-400">
             Loading Workspace
           </p>
@@ -94,7 +94,7 @@ export default function DashboardLayout({ children }) {
       <div className="dcota-sans min-h-screen bg-white">
 
         {/* ═══════════════════════════════════════════════════════════
-            NAVBAR — Swiss flat, hairline border, aksen merah dominan
+            NAVBAR — Swiss flat, hairline border, aksen oranye dominan
         ═══════════════════════════════════════════════════════════ */}
         <header
           className={cn(
@@ -103,15 +103,15 @@ export default function DashboardLayout({ children }) {
             isScrolled && "shadow-[0_1px_0_0_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.08)]"
           )}
         >
-          {/* garis merah tipis paling atas — pengikat identitas */}
-          <div className="h-[3px] w-full bg-[#ed1c24]" />
+          {/* garis oranye tipis paling atas — pengikat identitas */}
+          <div className="h-[3px] w-full bg-[#f26a21]" />
 
           <div className="mx-auto max-w-[1440px] flex h-16 items-center px-6 lg:px-12">
 
             {/* — LEFT: Logo + Brand — */}
             <div className="flex items-center gap-8">
               <button
-                className="flex h-10 w-10 items-center justify-center text-slate-900 hover:bg-[#ed1c24] hover:text-white transition-colors md:hidden -ml-1"
+                className="flex h-10 w-10 items-center justify-center text-slate-900 hover:bg-[#f26a21] hover:text-white transition-colors md:hidden -ml-1"
                 onClick={() => setSidebarOpen(true)}
                 aria-label="Buka menu"
               >
@@ -119,8 +119,8 @@ export default function DashboardLayout({ children }) {
               </button>
 
               <Link href="/dashboard" className="flex items-center gap-3 group">
-                {/* logo box merah — warna brand dominan */}
-                <div className="flex h-9 w-9 items-center justify-center bg-[#ed1c24] transition-colors duration-300">
+                {/* logo box oranye — warna brand dominan */}
+                <div className="flex h-9 w-9 items-center justify-center bg-[#f26a21] transition-colors duration-300">
                   <Image
                     src="/dcota-logo.png"
                     alt="Dcota"
@@ -153,16 +153,16 @@ export default function DashboardLayout({ children }) {
                     className={cn(
                       "relative flex items-center gap-2 px-3.5 h-16 text-[13px] font-semibold tracking-tight transition-colors",
                       active
-                        ? "text-[#ed1c24]"
+                        ? "text-[#f26a21]"
                         : "text-slate-500 hover:text-slate-900"
                     )}
                   >
                     <item.icon className="h-4 w-4" strokeWidth={2} />
                     {item.label}
-                    {/* underline merah: solid saat aktif, muncul saat hover */}
+                    {/* underline oranye: solid saat aktif, muncul saat hover */}
                     <span
                       className={cn(
-                        "absolute left-3 right-3 -bottom-px h-[2.5px] bg-[#ed1c24] origin-left transition-transform duration-300",
+                        "absolute left-3 right-3 -bottom-px h-[2.5px] bg-[#f26a21] origin-left transition-transform duration-300",
                         active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                       )}
                     />
@@ -177,7 +177,7 @@ export default function DashboardLayout({ children }) {
                     className={cn(
                       "relative flex items-center gap-2 px-3.5 h-16 text-[13px] font-semibold tracking-tight transition-colors outline-none",
                       isFeedbackActive
-                        ? "text-[#ed1c24]"
+                        ? "text-[#f26a21]"
                         : "text-slate-500 hover:text-slate-900"
                     )}
                   >
@@ -186,7 +186,7 @@ export default function DashboardLayout({ children }) {
                     <ChevronDownIcon className="h-3.5 w-3.5 ui-open:rotate-180 transition-transform" strokeWidth={2} />
                     <span
                       className={cn(
-                        "absolute left-3 right-3 -bottom-px h-[2.5px] bg-[#ed1c24] origin-left transition-transform duration-300",
+                        "absolute left-3 right-3 -bottom-px h-[2.5px] bg-[#f26a21] origin-left transition-transform duration-300",
                         isFeedbackActive ? "scale-x-100" : "scale-x-0"
                       )}
                     />
@@ -221,8 +221,8 @@ export default function DashboardLayout({ children }) {
 
               <Menu as="div" className="relative">
                 <Menu.Button className="flex items-center gap-3 group outline-none">
-                  {/* Avatar Swiss: kotak merah dengan initial mono */}
-                  <div className="flex h-9 w-9 items-center justify-center bg-[#ed1c24] group-hover:bg-[#c8131a] transition-colors duration-300 dcota-mono text-[13px] font-bold text-white">
+                  {/* Avatar Swiss: kotak oranye dengan initial mono */}
+                  <div className="flex h-9 w-9 items-center justify-center bg-[#f26a21] group-hover:bg-[#d4551a] transition-colors duration-300 dcota-mono text-[13px] font-bold text-white">
                     {initial}
                   </div>
                   <div className="hidden sm:flex flex-col items-start leading-none">
@@ -245,8 +245,8 @@ export default function DashboardLayout({ children }) {
                   leaveTo="opacity-0"
                 >
                   <Menu.Items className="absolute right-0 mt-3 w-[260px] bg-white border border-slate-200 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.16)] focus:outline-none">
-                    <div className="px-5 py-4 border-b border-slate-100 border-l-2 border-l-[#ed1c24]">
-                      <p className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#ed1c24] mb-1.5">
+                    <div className="px-5 py-4 border-b border-slate-100 border-l-2 border-l-[#f26a21]">
+                      <p className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#f26a21] mb-1.5">
                         Signed in as
                       </p>
                       <p className="text-[14px] font-extrabold tracking-tight text-slate-900 leading-tight">
@@ -281,7 +281,7 @@ export default function DashboardLayout({ children }) {
                             onClick={handleLogout}
                             className={cn(
                               "flex w-full items-center justify-between gap-3 px-5 py-3.5 text-[13px] font-semibold transition-colors",
-                              active ? "bg-[#ed1c24] text-white" : "text-[#ed1c24]"
+                              active ? "bg-[#f26a21] text-white" : "text-[#f26a21]"
                             )}
                           >
                             <span className="flex items-center gap-3">
@@ -324,13 +324,13 @@ export default function DashboardLayout({ children }) {
                 leaveFrom="translate-x-0" leaveTo="-translate-x-full"
               >
                 <Dialog.Panel className="dcota-sans relative flex w-full max-w-[320px] flex-col bg-white">
-                  {/* garis merah pengikat identitas */}
-                  <div className="h-[3px] w-full bg-[#ed1c24]" />
+                  {/* garis oranye pengikat identitas */}
+                  <div className="h-[3px] w-full bg-[#f26a21]" />
 
                   {/* Sidebar header */}
                   <div className="flex h-16 items-center justify-between px-6 border-b border-slate-200">
                     <Link href="/dashboard" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center bg-[#ed1c24]">
+                      <div className="flex h-9 w-9 items-center justify-center bg-[#f26a21]">
                         <Image src="/dcota-logo.png" alt="Logo" width={20} height={20} className="invert brightness-0" />
                       </div>
                       <div className="flex flex-col leading-none">
@@ -344,7 +344,7 @@ export default function DashboardLayout({ children }) {
                     </Link>
                     <button
                       onClick={() => setSidebarOpen(false)}
-                      className="flex h-10 w-10 items-center justify-center text-slate-900 hover:bg-[#ed1c24] hover:text-white transition-colors -mr-1"
+                      className="flex h-10 w-10 items-center justify-center text-slate-900 hover:bg-[#f26a21] hover:text-white transition-colors -mr-1"
                       aria-label="Tutup menu"
                     >
                       <XMarkIcon className="h-5 w-5" strokeWidth={2} />
@@ -353,7 +353,7 @@ export default function DashboardLayout({ children }) {
 
                   {/* User info strip */}
                   <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center bg-[#ed1c24] dcota-mono text-[14px] font-bold text-white">
+                    <div className="flex h-10 w-10 items-center justify-center bg-[#f26a21] dcota-mono text-[14px] font-bold text-white">
                       {initial}
                     </div>
                     <div className="flex flex-col leading-tight min-w-0">
@@ -369,7 +369,7 @@ export default function DashboardLayout({ children }) {
                   {/* Nav items */}
                   <div className="flex-1 overflow-y-auto">
                     <div className="px-6 pt-5 pb-2">
-                      <p className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#ed1c24]">
+                      <p className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#f26a21]">
                         Menu
                       </p>
                     </div>
@@ -394,7 +394,7 @@ export default function DashboardLayout({ children }) {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-3 px-6 py-4 text-[13px] font-semibold text-[#ed1c24] hover:bg-[#ed1c24] hover:text-white transition-colors w-full"
+                      className="flex items-center gap-3 px-6 py-4 text-[13px] font-semibold text-[#f26a21] hover:bg-[#f26a21] hover:text-white transition-colors w-full"
                     >
                       <ArrowLeftOnRectangleIcon className="h-4 w-4" strokeWidth={2} />
                       Logout
@@ -431,10 +431,10 @@ function DropdownItem({ href, code, title, desc }) {
           href={href}
           className={cn(
             "group flex items-start gap-4 px-5 py-4 transition-colors border-l-2",
-            active ? "bg-slate-50 border-[#ed1c24]" : "bg-white border-transparent"
+            active ? "bg-slate-50 border-[#f26a21]" : "bg-white border-transparent"
           )}
         >
-          <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 mt-1 group-hover:text-[#ed1c24] transition-colors">
+          <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 mt-1 group-hover:text-[#f26a21] transition-colors">
             {code}
           </span>
           <div className="flex-1 min-w-0">
@@ -472,23 +472,23 @@ function NavMobile({ menu, onNavigate, feedbackAllowed, userRole, feedbackRoutes
             className={cn(
               "relative flex items-center gap-4 px-6 py-4 transition-colors border-l-2",
               active
-                ? "border-[#ed1c24] bg-[#ed1c24]/[0.06]"
+                ? "border-[#f26a21] bg-[#f26a21]/[0.06]"
                 : "border-transparent hover:bg-slate-50"
             )}
           >
             <span className={cn(
               "dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em]",
-              active ? "text-[#ed1c24]" : "text-slate-400"
+              active ? "text-[#f26a21]" : "text-slate-400"
             )}>
               {code}
             </span>
             <item.icon className={cn(
               "h-4 w-4",
-              active ? "text-[#ed1c24]" : "text-slate-500"
+              active ? "text-[#f26a21]" : "text-slate-500"
             )} strokeWidth={2} />
             <span className={cn(
               "text-[13px] font-semibold tracking-tight",
-              active ? "text-[#ed1c24]" : "text-slate-700"
+              active ? "text-[#f26a21]" : "text-slate-700"
             )}>
               {item.label}
             </span>
@@ -503,23 +503,23 @@ function NavMobile({ menu, onNavigate, feedbackAllowed, userRole, feedbackRoutes
             className={cn(
               "relative flex items-center gap-4 px-6 py-4 transition-colors border-l-2 w-full text-left",
               feedbackRoutes.includes(pathname)
-                ? "border-[#ed1c24] bg-[#ed1c24]/[0.06]"
+                ? "border-[#f26a21] bg-[#f26a21]/[0.06]"
                 : "border-transparent hover:bg-slate-50"
             )}
           >
             <span className={cn(
               "dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em]",
-              feedbackRoutes.includes(pathname) ? "text-[#ed1c24]" : "text-slate-400"
+              feedbackRoutes.includes(pathname) ? "text-[#f26a21]" : "text-slate-400"
             )}>
               {String(menu.length + 1).padStart(2, '0')}
             </span>
             <InboxStackIcon className={cn(
               "h-4 w-4",
-              feedbackRoutes.includes(pathname) ? "text-[#ed1c24]" : "text-slate-500"
+              feedbackRoutes.includes(pathname) ? "text-[#f26a21]" : "text-slate-500"
             )} strokeWidth={2} />
             <span className={cn(
               "text-[13px] font-semibold tracking-tight flex-1",
-              feedbackRoutes.includes(pathname) ? "text-[#ed1c24]" : "text-slate-700"
+              feedbackRoutes.includes(pathname) ? "text-[#f26a21]" : "text-slate-700"
             )}>
               Feedback
             </span>
@@ -543,7 +543,7 @@ function NavMobile({ menu, onNavigate, feedbackAllowed, userRole, feedbackRoutes
                   className={cn(
                     "block pl-[68px] pr-6 py-3 text-[12.5px] font-semibold transition-colors",
                     pathname === sub.href
-                      ? "text-[#ed1c24]"
+                      ? "text-[#f26a21]"
                       : "text-slate-500 hover:text-slate-900"
                   )}
                 >

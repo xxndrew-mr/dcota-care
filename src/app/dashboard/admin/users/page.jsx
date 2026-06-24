@@ -21,107 +21,113 @@ import {
 
 const ROWS_PER_PAGE = 10;
 
-/* ─────────────────────────────────────────────
-   INPUT STYLE — Swiss: underline-only, bukan box
-───────────────────────────────────────────── */
 const INPUT_CLASSES =
-  "block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-2.5 text-sm font-semibold text-slate-900 placeholder-slate-300 transition-colors focus:border-[#ed1c24] focus:outline-none focus:ring-0";
+  'block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-2.5 text-sm font-semibold text-slate-900 placeholder-slate-300 transition-colors focus:border-[#f26a21] focus:outline-none focus:ring-0';
+
 const SELECT_CLASSES = `${INPUT_CLASSES} cursor-pointer appearance-none bg-no-repeat bg-[length:14px] bg-[right_center] pr-6`;
 
-/* Inline arrow untuk select */
-const selectArrowStyle = {
+const SELECT_ARROW_STYLE = {
   backgroundImage:
     "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E\")",
 };
 
-/* ─────────────────────────────────────────────
-   BADGE — flat, no rounded-full, no ring
-───────────────────────────────────────────── */
-const Badge = ({ children, variant }) => {
+const DIVISION_REQUIRED_ROLES = [
+  'Salesman',
+  'Sales Manager',
+  'PIC OMI',
+  'Agen',
+  'Acting Manager',
+  'Acting PIC',
+];
+
+function Badge({ children, variant }) {
   const styles = {
     Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     Inactive: 'bg-slate-100 text-slate-500 border-slate-200',
     role: 'bg-slate-900 text-white border-slate-900',
   };
   const cls = styles[children] || styles[variant] || styles.role;
+  const isStatus = children === 'Active' || children === 'Inactive';
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] dcota-mono ${cls}`}
+      className={`dcota-mono inline-flex items-center gap-1.5 border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] ${cls}`}
     >
-      {(children === 'Active' || children === 'Inactive') && (
+      {isStatus && (
         <span
-          className={`inline-block w-1.5 h-1.5 ${children === 'Active' ? 'bg-emerald-500' : 'bg-slate-400'
-            }`}
+          className={`inline-block h-1.5 w-1.5 ${children === 'Active' ? 'bg-emerald-500' : 'bg-slate-400'}`}
         />
       )}
       {children}
     </span>
   );
-};
+}
 
-/* ─────────────────────────────────────────────
-   SKELETON — sesuai grid baru
-───────────────────────────────────────────── */
-const SkeletonRow = ({ idx }) => (
-  <tr className="animate-pulse border-b border-slate-100">
-    <td className="px-6 py-5">
-      <div className="h-3 w-6 bg-slate-100" />
-    </td>
-    <td className="px-6 py-5">
-      <div className="flex items-center gap-4">
-        <div className="h-10 w-10 bg-slate-200" />
-        <div className="space-y-2">
-          <div className="h-3 w-32 bg-slate-200" />
-          <div className="h-2 w-20 bg-slate-100" />
+function SkeletonRow() {
+  return (
+    <tr className="animate-pulse border-b border-slate-100">
+      <td className="px-6 py-5">
+        <div className="h-3 w-6 bg-slate-100" />
+      </td>
+      <td className="px-6 py-5">
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-10 bg-slate-200" />
+          <div className="space-y-2">
+            <div className="h-3 w-32 bg-slate-200" />
+            <div className="h-2 w-20 bg-slate-100" />
+          </div>
         </div>
+      </td>
+      <td className="px-6 py-5">
+        <div className="h-4 w-24 bg-slate-100" />
+      </td>
+      <td className="px-6 py-5">
+        <div className="h-4 w-24 bg-slate-100" />
+      </td>
+      <td className="px-6 py-5">
+        <div className="h-5 w-16 bg-slate-200" />
+      </td>
+      <td className="px-6 py-5">
+        <div className="flex justify-end gap-2">
+          <div className="h-8 w-8 bg-slate-100" />
+          <div className="h-8 w-8 bg-slate-100" />
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function SkeletonMobile() {
+  return (
+    <div className="flex animate-pulse items-center gap-3 border-b border-slate-100 px-6 py-4">
+      <div className="h-10 w-10 shrink-0 bg-slate-200" />
+      <div className="flex-1 space-y-2">
+        <div className="h-3 w-32 bg-slate-200" />
+        <div className="h-2 w-24 bg-slate-100" />
       </div>
-    </td>
-    <td className="px-6 py-5"><div className="h-4 w-24 bg-slate-100" /></td>
-    <td className="px-6 py-5"><div className="h-4 w-24 bg-slate-100" /></td>
-    <td className="px-6 py-5"><div className="h-5 w-16 bg-slate-200" /></td>
-    <td className="px-6 py-5">
-      <div className="flex justify-end gap-2">
-        <div className="h-8 w-8 bg-slate-100" />
-        <div className="h-8 w-8 bg-slate-100" />
+      <div className="h-5 w-14 bg-slate-200" />
+    </div>
+  );
+}
+
+function FormField({ label, code, children }) {
+  return (
+    <div>
+      <div className="mb-1 flex items-baseline gap-3">
+        {code && (
+          <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+            {code}
+          </span>
+        )}
+        <label className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+          {label}
+        </label>
       </div>
-    </td>
-  </tr>
-);
-
-const SkeletonMobile = () => (
-  <div className="flex items-center gap-3 px-6 py-4 animate-pulse border-b border-slate-100">
-    <div className="h-10 w-10 bg-slate-200 shrink-0" />
-    <div className="flex-1 space-y-2">
-      <div className="h-3 w-32 bg-slate-200" />
-      <div className="h-2 w-24 bg-slate-100" />
+      {children}
     </div>
-    <div className="h-5 w-14 bg-slate-200" />
-  </div>
-);
+  );
+}
 
-/* ─────────────────────────────────────────────
-   FORM FIELD — label mono kecil + input
-───────────────────────────────────────────── */
-const FormField = ({ label, code, children }) => (
-  <div>
-    <div className="flex items-baseline gap-3 mb-1">
-      {code && (
-        <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-          {code}
-        </span>
-      )}
-      <label className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-        {label}
-      </label>
-    </div>
-    {children}
-  </div>
-);
-
-/* ═════════════════════════════════════════════
-   USER FORM (Modal content)
-═════════════════════════════════════════════ */
 function UserForm({
   buttonText,
   initialData,
@@ -143,23 +149,25 @@ function UserForm({
     pic_omi_id: initialData?.pic_omi_id || '',
   });
 
-  const [viewerDivisions, setViewerDivisions] = useState(initialData?.viewer_division_ids || []);
+  const [viewerDivisions, setViewerDivisions] = useState(
+    initialData?.viewer_division_ids || []
+  );
 
   const selectedRoleName = roles.find(
-    (r) => r.role_id.toString() === formData.role_id.toString()
+    (role) => role.role_id.toString() === formData.role_id.toString()
   )?.role_name;
 
-  const isDivisionRequired = ['Salesman', 'Sales Manager', 'PIC OMI', 'Agen', 'Acting Manager', 'Acting PIC'].includes(selectedRoleName);
+  const isDivisionRequired = DIVISION_REQUIRED_ROLES.includes(selectedRoleName);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRoleChange = (e) => {
+  const handleRoleChange = (event) => {
     setFormData((prev) => ({
       ...prev,
-      role_id: e.target.value,
+      role_id: event.target.value,
       division_id: '',
       pic_omi_id: '',
     }));
@@ -167,12 +175,12 @@ function UserForm({
 
   const toggleViewerDivision = (id) => {
     setViewerDivisions((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((value) => value !== id) : [...prev, id]
     );
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
     onSubmit({
       ...formData,
       viewer_division_ids: selectedRoleName === 'Viewer' ? viewerDivisions : [],
@@ -182,14 +190,12 @@ function UserForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-
-        {/* COL 1: Akses Akun */}
         <div className="space-y-5">
           <div className="flex items-baseline gap-3 border-b border-slate-200 pb-2">
-            <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ed1c24]">
+            <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#f26a21]">
               ①
             </span>
-            <IdentificationIcon className="h-4 w-4 text-[#ed1c24]" strokeWidth={1.8} />
+            <IdentificationIcon className="h-4 w-4 text-[#f26a21]" strokeWidth={1.8} />
             <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-slate-900">
               Akses Akun
             </span>
@@ -221,7 +227,7 @@ function UserForm({
 
           <FormField label="Username" code="03">
             <div className="relative">
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 dcota-mono text-sm font-bold text-slate-300">
+              <span className="dcota-mono absolute left-0 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-300">
                 @
               </span>
               <input
@@ -259,13 +265,12 @@ function UserForm({
           </FormField>
         </div>
 
-        {/* COL 2: Peran & Struktur */}
         <div className="space-y-5">
           <div className="flex items-baseline gap-3 border-b border-slate-200 pb-2">
-            <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ed1c24]">
+            <span className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#f26a21]">
               ②
             </span>
-            <BriefcaseIcon className="h-4 w-4 text-[#ed1c24]" strokeWidth={1.8} />
+            <BriefcaseIcon className="h-4 w-4 text-[#f26a21]" strokeWidth={1.8} />
             <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-slate-900">
               Peran & Struktur
             </span>
@@ -278,7 +283,7 @@ function UserForm({
               onChange={handleRoleChange}
               required
               className={SELECT_CLASSES}
-              style={selectArrowStyle}
+              style={SELECT_ARROW_STYLE}
             >
               <option value="">Pilih Role...</option>
               {roles.map((role) => (
@@ -290,7 +295,7 @@ function UserForm({
           </FormField>
 
           {selectedRoleName && (
-            <div className="animate-in fade-in slide-in-from-top-1 duration-200 space-y-5">
+            <div className="animate-in fade-in slide-in-from-top-1 space-y-5 duration-200">
               {isDivisionRequired && (
                 <FormField label="Divisi" code="07">
                   <select
@@ -299,12 +304,12 @@ function UserForm({
                     onChange={handleInputChange}
                     required
                     className={SELECT_CLASSES}
-                    style={selectArrowStyle}
+                    style={SELECT_ARROW_STYLE}
                   >
                     <option value="">Pilih Divisi...</option>
-                    {divisions.map((div) => (
-                      <option key={div.division_id} value={div.division_id}>
-                        {div.division_name}
+                    {divisions.map((division) => (
+                      <option key={division.division_id} value={division.division_id}>
+                        {division.division_name}
                       </option>
                     ))}
                   </select>
@@ -313,19 +318,19 @@ function UserForm({
 
               {selectedRoleName === 'Viewer' && (
                 <FormField label="Akses Divisi Viewer" code="07">
-                  <div className="mt-1 max-h-40 overflow-y-auto border border-slate-200 divide-y divide-slate-100">
-                    {divisions.map((div) => (
+                  <div className="mt-1 max-h-40 divide-y divide-slate-100 overflow-y-auto border border-slate-200">
+                    {divisions.map((division) => (
                       <label
-                        key={div.division_id}
-                        className="flex items-center gap-3 px-3 py-2.5 text-[12.5px] font-semibold text-slate-700 cursor-pointer hover:bg-slate-50 transition-colors"
+                        key={division.division_id}
+                        className="flex cursor-pointer items-center gap-3 px-3 py-2.5 text-[12.5px] font-semibold text-slate-700 transition-colors hover:bg-slate-50"
                       >
                         <input
                           type="checkbox"
-                          checked={viewerDivisions.includes(div.division_id)}
-                          onChange={() => toggleViewerDivision(div.division_id)}
-                          className="h-4 w-4 border-slate-300 text-[#ed1c24] focus:ring-[#ed1c24] focus:ring-offset-0 accent-[#ed1c24]"
+                          checked={viewerDivisions.includes(division.division_id)}
+                          onChange={() => toggleViewerDivision(division.division_id)}
+                          className="h-4 w-4 border-slate-300 accent-[#f26a21] text-[#f26a21] focus:ring-[#f26a21] focus:ring-offset-0"
                         />
-                        {div.division_name}
+                        {division.division_name}
                       </label>
                     ))}
                   </div>
@@ -340,7 +345,7 @@ function UserForm({
                     onChange={handleInputChange}
                     required
                     className={SELECT_CLASSES}
-                    style={selectArrowStyle}
+                    style={SELECT_ARROW_STYLE}
                   >
                     <option value="">Pilih PIC OMI...</option>
                     {picOmis.map((pic) => (
@@ -356,7 +361,6 @@ function UserForm({
         </div>
       </div>
 
-      {/* Action bar */}
       <div className="flex items-center justify-between border-t border-slate-200 pt-6">
         <p className="dcota-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">
           {initialData ? 'Mode: Edit' : 'Mode: New'}
@@ -365,14 +369,14 @@ function UserForm({
           <button
             type="button"
             onClick={onClose}
-            className="dcota-mono text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 hover:text-slate-900 border border-transparent hover:border-slate-300 px-4 py-3 transition-colors"
+            className="dcota-mono border border-transparent px-4 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-900"
           >
             Batal
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="dcota-mono flex items-center gap-2 bg-[#ed1c24] hover:bg-[#c8131a] px-6 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors disabled:opacity-50"
+            className="dcota-mono flex items-center gap-2 bg-[#f26a21] px-6 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#d4551a] disabled:opacity-50"
           >
             {isLoading ? (
               <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
@@ -387,21 +391,17 @@ function UserForm({
   );
 }
 
-/* ═════════════════════════════════════════════
-   PAGINATION
-═════════════════════════════════════════════ */
 function Pagination({ currentPage, totalPages, onPageChange, totalItems, rowsPerPage }) {
-  if (totalPages <= 1) return null;
-
   const startRange = (currentPage - 1) * rowsPerPage + 1;
   const endRange = Math.min(currentPage * rowsPerPage, totalItems);
 
   const pages = useMemo(() => {
     const items = [];
     const delta = 1;
-    for (let i = 1; i <= totalPages; i++) {
-      if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
-        items.push(i);
+    for (let page = 1; page <= totalPages; page += 1) {
+      const withinRange = page >= currentPage - delta && page <= currentPage + delta;
+      if (page === 1 || page === totalPages || withinRange) {
+        items.push(page);
       } else if (items[items.length - 1] !== '...') {
         items.push('...');
       }
@@ -409,12 +409,18 @@ function Pagination({ currentPage, totalPages, onPageChange, totalItems, rowsPer
     return items;
   }, [currentPage, totalPages]);
 
+  if (totalPages <= 1) return null;
+
   return (
     <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-200 bg-white px-6 py-4 sm:flex-row">
       <p className="dcota-mono text-[10.5px] uppercase tracking-[0.18em] text-slate-400">
-        <span className="font-bold text-slate-900">{String(startRange).padStart(3, '0')}–{String(endRange).padStart(3, '0')}</span>
-        {' '}of{' '}
-        <span className="font-bold text-slate-900">{String(totalItems).padStart(3, '0')}</span>
+        <span className="font-bold text-slate-900">
+          {String(startRange).padStart(3, '0')}–{String(endRange).padStart(3, '0')}
+        </span>{' '}
+        of{' '}
+        <span className="font-bold text-slate-900">
+          {String(totalItems).padStart(3, '0')}
+        </span>
       </p>
 
       <div className="flex items-center gap-0.5">
@@ -422,16 +428,16 @@ function Pagination({ currentPage, totalPages, onPageChange, totalItems, rowsPer
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           aria-label="Halaman sebelumnya"
-          className="flex h-9 w-9 items-center justify-center border border-slate-200 text-slate-500 transition-colors hover:border-slate-900 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:text-slate-500 -mr-px"
+          className="-mr-px flex h-9 w-9 items-center justify-center border border-slate-200 text-slate-500 transition-colors hover:border-slate-900 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-slate-200 disabled:hover:text-slate-500"
         >
           <ChevronLeftIcon className="h-3.5 w-3.5" strokeWidth={2} />
         </button>
 
-        {pages.map((page, idx) =>
+        {pages.map((page, index) =>
           page === '...' ? (
             <span
-              key={`ellipsis-${idx}`}
-              className="dcota-mono flex h-9 w-9 items-center justify-center text-[11px] text-slate-300 border-y border-slate-200 -mr-px"
+              key={`ellipsis-${index}`}
+              className="dcota-mono -mr-px flex h-9 w-9 items-center justify-center border-y border-slate-200 text-[11px] text-slate-300"
             >
               …
             </span>
@@ -439,10 +445,10 @@ function Pagination({ currentPage, totalPages, onPageChange, totalItems, rowsPer
             <button
               key={page}
               onClick={() => onPageChange(page)}
-              aria-current={currentPage === page ? "page" : undefined}
-              className={`dcota-mono flex h-9 w-9 items-center justify-center text-[11px] font-bold transition-colors -mr-px ${currentPage === page
-                ? 'bg-[#ed1c24] text-white border border-[#ed1c24] z-10 relative'
-                : 'border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-900 hover:z-10 hover:relative'
+              aria-current={currentPage === page ? 'page' : undefined}
+              className={`dcota-mono -mr-px flex h-9 w-9 items-center justify-center text-[11px] font-bold transition-colors ${currentPage === page
+                  ? 'relative z-10 border border-[#f26a21] bg-[#f26a21] text-white'
+                  : 'border border-slate-200 text-slate-500 hover:relative hover:z-10 hover:border-slate-900 hover:text-slate-900'
                 }`}
             >
               {String(page).padStart(2, '0')}
@@ -454,7 +460,7 @@ function Pagination({ currentPage, totalPages, onPageChange, totalItems, rowsPer
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           aria-label="Halaman berikutnya"
-          className="flex h-9 w-9 items-center justify-center border border-slate-200 text-slate-500 transition-colors hover:border-slate-900 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:text-slate-500"
+          className="flex h-9 w-9 items-center justify-center border border-slate-200 text-slate-500 transition-colors hover:border-slate-900 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-slate-200 disabled:hover:text-slate-500"
         >
           <ChevronRightIcon className="h-3.5 w-3.5" strokeWidth={2} />
         </button>
@@ -463,9 +469,22 @@ function Pagination({ currentPage, totalPages, onPageChange, totalItems, rowsPer
   );
 }
 
-/* ═════════════════════════════════════════════
-   MAIN PAGE
-═════════════════════════════════════════════ */
+function StatBlock({ label, value, code, accent }) {
+  return (
+    <div className="border-r border-slate-200 py-2 pl-6 last:border-r-0 lg:pl-8">
+      <div className="dcota-mono mb-2 text-[9px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+        {code} · {label}
+      </div>
+      <div
+        className={`text-5xl font-extrabold leading-none tracking-tight lg:text-6xl ${accent ? 'text-[#f26a21]' : 'text-slate-900'
+          }`}
+      >
+        {String(value).padStart(2, '0')}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminUsersPage() {
   const { data: session } = useSession();
 
@@ -502,9 +521,9 @@ export default function AdminUsersPage() {
       setDivisions(masterData.divisions);
       setUsers(usersData);
 
-      const picRole = masterData.roles.find((r) => r.role_name === 'PIC OMI');
+      const picRole = masterData.roles.find((role) => role.role_name === 'PIC OMI');
       if (picRole) {
-        setPicOmis(usersData.filter((u) => u.role_id === picRole.role_id));
+        setPicOmis(usersData.filter((user) => user.role_id === picRole.role_id));
       }
     } catch {
       triggerNotification('error', 'Gagal memuat data.');
@@ -513,8 +532,13 @@ export default function AdminUsersPage() {
     }
   };
 
-  useEffect(() => { loadInitialData(); }, []);
-  useEffect(() => { setCurrentPage(1); }, [searchTerm, filterRole, filterDiv]);
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterRole, filterDiv]);
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
@@ -534,17 +558,18 @@ export default function AdminUsersPage() {
     return filteredUsers.slice(start, start + ROWS_PER_PAGE);
   }, [filteredUsers, currentPage]);
 
-  const activeUsersCount = users.filter((u) => u.status === 'Active').length;
+  const activeUsersCount = users.filter((user) => user.status === 'Active').length;
   const inactiveUsersCount = users.length - activeUsersCount;
-  const totalRolesCount = roles.length;
-  const hasActiveFilters = searchTerm || filterRole || filterDiv;
+  const hasActiveFilters = Boolean(searchTerm || filterRole || filterDiv);
   const totalPagesCount = Math.max(1, Math.ceil(filteredUsers.length / ROWS_PER_PAGE));
 
-  const handleImportCsv = async (e) => {
-    const file = e.target.files[0];
+  const handleImportCsv = async (event) => {
+    const file = event.target.files[0];
     if (!file) return;
+
     const formData = new FormData();
     formData.append('file', file);
+
     try {
       const res = await fetch('/api/admin/import-salesman', { method: 'POST', body: formData });
       const data = await res.json();
@@ -598,7 +623,10 @@ export default function AdminUsersPage() {
       const body =
         currentStatus === 'Active'
           ? undefined
-          : JSON.stringify({ status: 'Active', ...users.find((u) => u.user_id === userId) });
+          : JSON.stringify({
+            status: 'Active',
+            ...users.find((user) => user.user_id === userId),
+          });
 
       const res = await fetch(`/api/admin/users/${userId}`, {
         method,
@@ -619,6 +647,17 @@ export default function AdminUsersPage() {
     setFilterDiv('');
   };
 
+  const closeModal = () => setModalState((prev) => ({ ...prev, isOpen: false }));
+
+  const tableHeaders = [
+    { label: '#', align: 'left', width: 'w-12' },
+    { label: 'Pengguna', align: 'left' },
+    { label: 'Role', align: 'left' },
+    { label: 'Divisi', align: 'left' },
+    { label: 'Status', align: 'left' },
+    { label: 'Aksi', align: 'right' },
+  ];
+
   return (
     <>
       <style>{`
@@ -627,11 +666,9 @@ export default function AdminUsersPage() {
         .dcota-mono { font-family: 'JetBrains Mono', monospace; }
       `}</style>
 
-      <div className="dcota-sans bg-white animate-in fade-in duration-500">
-
-        {/* Notification */}
+      <div className="dcota-sans animate-in fade-in bg-white duration-500">
         <Transition
-          show={!!notification}
+          show={Boolean(notification)}
           as={Fragment}
           enter="transition ease-out duration-300"
           enterFrom="opacity-0 -translate-y-2"
@@ -642,8 +679,8 @@ export default function AdminUsersPage() {
         >
           <div
             className={`fixed right-6 top-20 z-[60] flex items-center gap-3 border px-5 py-3.5 text-[12.5px] font-bold shadow-[0_8px_24px_-12px_rgba(15,23,42,0.2)] ${notification?.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-              : 'bg-[#ed1c24] border-[#ed1c24] text-white'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                : 'border-[#f26a21] bg-[#f26a21] text-white'
               }`}
           >
             {notification?.type === 'success' ? (
@@ -655,109 +692,105 @@ export default function AdminUsersPage() {
           </div>
         </Transition>
 
-        {/* ═══════════════════════════════════════════════════════
-            PAGE HEADER + STATS — Swiss strip
-        ═══════════════════════════════════════════════════════ */}
-        <section className="border-b border-slate-200 border-t-[3px] border-t-[#ed1c24]">
-          <div className="mx-auto max-w-[1440px] px-6 lg:px-12 pt-12 pb-10">
-
-            {/* Eyebrow */}
-            <div className="dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-400 mb-5 flex items-center gap-3">
-              <span className="bg-[#ed1c24] text-white px-2 py-1 font-semibold tracking-[0.2em]">ADMIN</span>
-              <span className="text-slate-900 font-semibold">DCOTA CARE</span>
+        <section className="border-b border-t-[3px] border-slate-200 border-t-[#f26a21]">
+          <div className="mx-auto max-w-[1440px] px-6 pb-10 pt-12 lg:px-12">
+            <div className="dcota-mono mb-5 flex items-center gap-3 text-[10.5px] uppercase tracking-[0.22em] text-slate-400">
+              <span className="bg-[#f26a21] px-2 py-1 font-semibold tracking-[0.2em] text-white">
+                ADMIN
+              </span>
+              <span className="font-semibold text-slate-900">DCOTA CARE</span>
               <span className="text-slate-300">/</span>
               <span>USERS</span>
             </div>
 
-            <div className="grid grid-cols-12 gap-6 items-end">
-              {/* Headline */}
+            <div className="grid grid-cols-12 items-end gap-6">
               <div className="col-span-12 lg:col-span-7">
-                <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight leading-[0.95]">
-                  Manajemen <span className="text-[#ed1c24]">User.</span>
+                <h1 className="text-5xl font-extrabold leading-[0.95] tracking-tight lg:text-6xl">
+                  Manajemen <span className="text-[#f26a21]">User.</span>
                 </h1>
-                <p className="text-sm text-slate-500 mt-4 max-w-md leading-relaxed">
+                <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-500">
                   Kelola hak akses, divisi, dan status akun seluruh anggota tim Dcota Care.
                 </p>
               </div>
 
-              {/* Stats raksasa di kanan — angka jadi star */}
-              <div className="col-span-12 lg:col-span-5 grid grid-cols-3 gap-0 border-l border-slate-200 lg:pl-0">
+              <div className="col-span-12 grid grid-cols-3 gap-0 border-l border-slate-200 lg:col-span-5 lg:pl-0">
                 <StatBlock label="Total" value={users.length} code="01" />
                 <StatBlock label="Aktif" value={activeUsersCount} code="02" accent />
                 <StatBlock label="Nonaktif" value={inactiveUsersCount} code="03" />
               </div>
             </div>
 
-            {/* Actions row */}
             <div className="mt-10 flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setModalState({ isOpen: true, type: 'create', user: null })}
-                className="dcota-mono flex items-center gap-2 bg-[#ed1c24] hover:bg-[#c8131a] text-white px-5 py-3 text-[11px] font-bold uppercase tracking-[0.14em] transition-colors"
+                className="dcota-mono flex items-center gap-2 bg-[#f26a21] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#d4551a]"
               >
                 <UserPlusIcon className="h-4 w-4" strokeWidth={2} />
                 Tambah User
               </button>
-              <label className="dcota-mono flex cursor-pointer items-center gap-2 border border-slate-300 hover:border-[#ed1c24] hover:text-[#ed1c24] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-900 transition-colors">
+              <label className="dcota-mono flex cursor-pointer items-center gap-2 border border-slate-300 px-5 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-900 transition-colors hover:border-[#f26a21] hover:text-[#f26a21]">
                 <ArrowUpTrayIcon className="h-4 w-4" strokeWidth={2} />
                 Import CSV
                 <input type="file" accept=".csv" className="hidden" onChange={handleImportCsv} />
               </label>
             </div>
-
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════
-            FILTER TOOLBAR
-        ═══════════════════════════════════════════════════════ */}
         <section className="border-b border-slate-200 bg-slate-50/40">
-          <div className="mx-auto max-w-[1440px] px-6 lg:px-12 py-4">
+          <div className="mx-auto max-w-[1440px] px-6 py-4 lg:px-12">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-
               <div className="relative flex-1">
-                <MagnifyingGlassIcon className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" strokeWidth={2} />
+                <MagnifyingGlassIcon
+                  className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  strokeWidth={2}
+                />
                 <input
                   type="text"
                   placeholder="Cari nama, username, email..."
-                  className="w-full border-0 border-b border-slate-200 bg-transparent pl-6 pr-4 py-2 text-[13px] font-semibold text-slate-900 placeholder-slate-300 focus:border-[#ed1c24] focus:outline-none focus:ring-0 transition-colors"
+                  className="w-full border-0 border-b border-slate-200 bg-transparent py-2 pl-6 pr-4 text-[13px] font-semibold text-slate-900 placeholder-slate-300 transition-colors focus:border-[#f26a21] focus:outline-none focus:ring-0"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(event) => setSearchTerm(event.target.value)}
                 />
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="dcota-mono text-[10px] uppercase tracking-[0.18em] text-slate-400 hidden sm:block">
+                <div className="dcota-mono hidden text-[10px] uppercase tracking-[0.18em] text-slate-400 sm:block">
                   Filter:
                 </div>
 
                 <select
                   value={filterRole}
-                  onChange={(e) => setFilterRole(e.target.value)}
-                  className="dcota-mono text-[11px] font-semibold uppercase tracking-[0.12em] border border-slate-200 hover:border-slate-900 bg-white px-3 py-2 text-slate-900 cursor-pointer appearance-none pr-7 transition-colors focus:outline-none focus:border-[#ed1c24]"
-                  style={selectArrowStyle}
+                  onChange={(event) => setFilterRole(event.target.value)}
+                  className="dcota-mono cursor-pointer appearance-none border border-slate-200 bg-white px-3 py-2 pr-7 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-900 transition-colors hover:border-slate-900 focus:border-[#f26a21] focus:outline-none"
+                  style={SELECT_ARROW_STYLE}
                 >
                   <option value="">Semua Role</option>
                   {roles.map((role) => (
-                    <option key={role.role_id} value={role.role_name}>{role.role_name}</option>
+                    <option key={role.role_id} value={role.role_name}>
+                      {role.role_name}
+                    </option>
                   ))}
                 </select>
 
                 <select
                   value={filterDiv}
-                  onChange={(e) => setFilterDiv(e.target.value)}
-                  className="dcota-mono text-[11px] font-semibold uppercase tracking-[0.12em] border border-slate-200 hover:border-slate-900 bg-white px-3 py-2 text-slate-900 cursor-pointer appearance-none pr-7 transition-colors focus:outline-none focus:border-[#ed1c24]"
-                  style={selectArrowStyle}
+                  onChange={(event) => setFilterDiv(event.target.value)}
+                  className="dcota-mono cursor-pointer appearance-none border border-slate-200 bg-white px-3 py-2 pr-7 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-900 transition-colors hover:border-slate-900 focus:border-[#f26a21] focus:outline-none"
+                  style={SELECT_ARROW_STYLE}
                 >
                   <option value="">Semua Divisi</option>
-                  {divisions.map((div) => (
-                    <option key={div.division_id} value={div.division_name}>{div.division_name}</option>
+                  {divisions.map((division) => (
+                    <option key={division.division_id} value={division.division_name}>
+                      {division.division_name}
+                    </option>
                   ))}
                 </select>
 
                 {hasActiveFilters && (
                   <button
                     onClick={resetFilters}
-                    className="dcota-mono flex items-center gap-1.5 border border-slate-200 hover:border-[#ed1c24] hover:text-[#ed1c24] px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500 transition-colors"
+                    className="dcota-mono flex items-center gap-1.5 border border-slate-200 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500 transition-colors hover:border-[#f26a21] hover:text-[#f26a21]"
                   >
                     <XMarkIcon className="h-3.5 w-3.5" strokeWidth={2} />
                     Reset
@@ -768,25 +801,16 @@ export default function AdminUsersPage() {
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════
-            TABLE DESKTOP
-        ═══════════════════════════════════════════════════════ */}
         <section className="hidden md:block">
-          <div className="mx-auto max-w-[1440px] px-6 lg:px-12 py-2">
+          <div className="mx-auto max-w-[1440px] px-6 py-2 lg:px-12">
             <table className="min-w-full">
               <thead>
                 <tr className="border-b border-slate-200">
-                  {[
-                    { label: '#', align: 'left', width: 'w-12' },
-                    { label: 'Pengguna', align: 'left' },
-                    { label: 'Role', align: 'left' },
-                    { label: 'Divisi', align: 'left' },
-                    { label: 'Status', align: 'left' },
-                    { label: 'Aksi', align: 'right' },
-                  ].map((header, idx) => (
+                  {tableHeaders.map((header) => (
                     <th
-                      key={idx}
-                      className={`dcota-mono px-6 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 ${header.align === 'right' ? 'text-right' : 'text-left'} ${header.width || ''}`}
+                      key={header.label}
+                      className={`dcota-mono px-6 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 ${header.align === 'right' ? 'text-right' : 'text-left'
+                        } ${header.width || ''}`}
                     >
                       {header.label}
                     </th>
@@ -795,7 +819,9 @@ export default function AdminUsersPage() {
               </thead>
               <tbody>
                 {isLoading ? (
-                  Array.from({ length: ROWS_PER_PAGE }).map((_, i) => <SkeletonRow key={i} idx={i} />)
+                  Array.from({ length: ROWS_PER_PAGE }).map((_, index) => (
+                    <SkeletonRow key={index} />
+                  ))
                 ) : pagedUsers.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="py-24 text-center">
@@ -805,7 +831,10 @@ export default function AdminUsersPage() {
                           No users found
                         </p>
                         {hasActiveFilters && (
-                          <button onClick={resetFilters} className="dcota-mono text-[10px] uppercase tracking-[0.18em] text-[#ed1c24] hover:underline mt-1">
+                          <button
+                            onClick={resetFilters}
+                            className="dcota-mono mt-1 text-[10px] uppercase tracking-[0.18em] text-[#f26a21] hover:underline"
+                          >
                             Reset filter
                           </button>
                         )}
@@ -813,69 +842,74 @@ export default function AdminUsersPage() {
                     </td>
                   </tr>
                 ) : (
-                  pagedUsers.map((user, idx) => {
-                    const rowNum = (currentPage - 1) * ROWS_PER_PAGE + idx + 1;
+                  pagedUsers.map((user, index) => {
+                    const rowNum = (currentPage - 1) * ROWS_PER_PAGE + index + 1;
                     return (
-                      <tr key={user.user_id} className="group border-b border-slate-100 hover:bg-[#ed1c24]/[0.03] transition-colors">
-                        {/* Number */}
+                      <tr
+                        key={user.user_id}
+                        className="group border-b border-slate-100 transition-colors hover:bg-[#f26a21]/[0.03]"
+                      >
                         <td className="px-6 py-4">
-                          <span className="dcota-mono text-[11px] font-semibold text-slate-300 group-hover:text-[#ed1c24] transition-colors">
+                          <span className="dcota-mono text-[11px] font-semibold text-slate-300 transition-colors group-hover:text-[#f26a21]">
                             {String(rowNum).padStart(3, '0')}
                           </span>
                         </td>
 
-                        {/* User */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#ed1c24] dcota-mono text-[13px] font-bold text-white">
+                            <div className="dcota-mono flex h-10 w-10 shrink-0 items-center justify-center bg-[#f26a21] text-[13px] font-bold text-white">
                               {user.name.charAt(0).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[13.5px] font-extrabold text-slate-900 truncate">
+                              <p className="truncate text-[13.5px] font-extrabold text-slate-900">
                                 {user.name}
                               </p>
-                              <p className="dcota-mono text-[10.5px] font-semibold text-slate-400 mt-0.5">
+                              <p className="dcota-mono mt-0.5 text-[10.5px] font-semibold text-slate-400">
                                 @{user.username}
                               </p>
                             </div>
                           </div>
                         </td>
 
-                        {/* Role */}
                         <td className="px-6 py-4">
                           <Badge variant="role">{user.role?.role_name}</Badge>
                         </td>
 
-                        {/* Divisi */}
                         <td className="px-6 py-4">
                           <span className="text-[12.5px] font-semibold text-slate-700">
-                            {user.division?.division_name || <span className="text-slate-300">—</span>}
+                            {user.division?.division_name || (
+                              <span className="text-slate-300">—</span>
+                            )}
                           </span>
                         </td>
 
-                        {/* Status */}
                         <td className="px-6 py-4">
                           <Badge>{user.status}</Badge>
                         </td>
 
-                        {/* Actions — tombol berbingkai, hit-area jelas */}
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
                               onClick={() => setModalState({ isOpen: true, type: 'edit', user })}
-                              className="flex h-8 w-8 items-center justify-center border border-slate-200 text-slate-500 hover:border-slate-900 hover:text-slate-900 transition-colors"
+                              className="flex h-8 w-8 items-center justify-center border border-slate-200 text-slate-500 transition-colors hover:border-slate-900 hover:text-slate-900"
                               title="Edit user"
                             >
                               <PencilSquareIcon className="h-4 w-4" strokeWidth={1.8} />
                             </button>
                             {session?.user?.id !== user.user_id && (
                               <button
-                                onClick={() => handleToggleStatus(user.user_id, user.status, user.name)}
+                                onClick={() =>
+                                  handleToggleStatus(user.user_id, user.status, user.name)
+                                }
                                 className={`flex h-8 w-8 items-center justify-center border transition-colors ${user.status === 'Active'
-                                  ? 'border-slate-200 text-slate-500 hover:border-[#ed1c24] hover:text-[#ed1c24]'
-                                  : 'border-slate-200 text-slate-500 hover:border-emerald-600 hover:text-emerald-600'
+                                    ? 'border-slate-200 text-slate-500 hover:border-[#f26a21] hover:text-[#f26a21]'
+                                    : 'border-slate-200 text-slate-500 hover:border-emerald-600 hover:text-emerald-600'
                                   }`}
-                                title={user.status === 'Active' ? 'Nonaktifkan user' : 'Aktifkan user'}
+                                title={
+                                  user.status === 'Active'
+                                    ? 'Nonaktifkan user'
+                                    : 'Aktifkan user'
+                                }
                               >
                                 {user.status === 'Active' ? (
                                   <NoSymbolIcon className="h-4 w-4" strokeWidth={1.8} />
@@ -905,36 +939,36 @@ export default function AdminUsersPage() {
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════
-            MOBILE LIST
-        ═══════════════════════════════════════════════════════ */}
         <section className="md:hidden">
           <div className="mx-auto max-w-[1440px]">
             {isLoading ? (
-              Array.from({ length: 6 }).map((_, i) => <SkeletonMobile key={i} />)
+              Array.from({ length: 6 }).map((_, index) => <SkeletonMobile key={index} />)
             ) : pagedUsers.length === 0 ? (
               <div className="flex flex-col items-center gap-3 py-20 text-slate-400">
                 <UsersIcon className="h-8 w-8 opacity-30" strokeWidth={1.5} />
                 <p className="dcota-mono text-[11px] uppercase tracking-[0.18em]">No users</p>
               </div>
             ) : (
-              pagedUsers.map((user, idx) => {
-                const rowNum = (currentPage - 1) * ROWS_PER_PAGE + idx + 1;
+              pagedUsers.map((user, index) => {
+                const rowNum = (currentPage - 1) * ROWS_PER_PAGE + index + 1;
                 return (
-                  <div key={user.user_id} className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 hover:bg-[#ed1c24]/[0.03] transition-colors">
-                    <span className="dcota-mono text-[10px] font-semibold text-slate-300 w-6">
+                  <div
+                    key={user.user_id}
+                    className="flex items-center gap-3 border-b border-slate-100 px-6 py-4 transition-colors hover:bg-[#f26a21]/[0.03]"
+                  >
+                    <span className="dcota-mono w-6 text-[10px] font-semibold text-slate-300">
                       {String(rowNum).padStart(3, '0')}
                     </span>
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#ed1c24] dcota-mono text-[13px] font-bold text-white">
+                    <div className="dcota-mono flex h-10 w-10 shrink-0 items-center justify-center bg-[#f26a21] text-[13px] font-bold text-white">
                       {user.name.charAt(0).toUpperCase()}
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-[13px] font-extrabold text-slate-900 truncate">
+                        <span className="truncate text-[13px] font-extrabold text-slate-900">
                           {user.name}
                         </span>
                       </div>
-                      <p className="dcota-mono text-[10px] font-semibold text-slate-400 truncate mt-0.5">
+                      <p className="dcota-mono mt-0.5 truncate text-[10px] font-semibold text-slate-400">
                         {user.role?.role_name} · {user.division?.division_name || 'No Div'}
                       </p>
                     </div>
@@ -942,7 +976,7 @@ export default function AdminUsersPage() {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setModalState({ isOpen: true, type: 'edit', user })}
-                        className="flex h-8 w-8 items-center justify-center border border-slate-200 text-slate-500 hover:border-slate-900 hover:text-slate-900 transition-colors"
+                        className="flex h-8 w-8 items-center justify-center border border-slate-200 text-slate-500 transition-colors hover:border-slate-900 hover:text-slate-900"
                         title="Edit user"
                       >
                         <PencilSquareIcon className="h-4 w-4" strokeWidth={1.8} />
@@ -951,12 +985,16 @@ export default function AdminUsersPage() {
                         <button
                           onClick={() => handleToggleStatus(user.user_id, user.status, user.name)}
                           className={`flex h-8 w-8 items-center justify-center border transition-colors ${user.status === 'Active'
-                            ? 'border-slate-200 text-slate-500 hover:border-[#ed1c24] hover:text-[#ed1c24]'
-                            : 'border-slate-200 text-slate-500 hover:border-emerald-600 hover:text-emerald-600'
+                              ? 'border-slate-200 text-slate-500 hover:border-[#f26a21] hover:text-[#f26a21]'
+                              : 'border-slate-200 text-slate-500 hover:border-emerald-600 hover:text-emerald-600'
                             }`}
                           title={user.status === 'Active' ? 'Nonaktifkan user' : 'Aktifkan user'}
                         >
-                          {user.status === 'Active' ? <NoSymbolIcon className="h-4 w-4" strokeWidth={1.8} /> : <CheckCircleIcon className="h-4 w-4" strokeWidth={1.8} />}
+                          {user.status === 'Active' ? (
+                            <NoSymbolIcon className="h-4 w-4" strokeWidth={1.8} />
+                          ) : (
+                            <CheckCircleIcon className="h-4 w-4" strokeWidth={1.8} />
+                          )}
                         </button>
                       )}
                     </div>
@@ -976,15 +1014,16 @@ export default function AdminUsersPage() {
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════
-            MODAL
-        ═══════════════════════════════════════════════════════ */}
         <Transition appear show={modalState.isOpen} as={Fragment}>
-          <Dialog as="div" className="dcota-sans relative z-[100]" onClose={() => setModalState((prev) => ({ ...prev, isOpen: false }))}>
+          <Dialog as="div" className="dcota-sans relative z-[100]" onClose={closeModal}>
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100"
-              leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0"
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
             >
               <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px]" />
             </Transition.Child>
@@ -993,25 +1032,27 @@ export default function AdminUsersPage() {
               <div className="flex min-h-full items-start justify-center p-4 pt-16">
                 <Transition.Child
                   as={Fragment}
-                  enter="ease-out duration-300" enterFrom="opacity-0 translate-y-3" enterTo="opacity-100 translate-y-0"
-                  leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0"
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 translate-y-3"
+                  enterTo="opacity-100 translate-y-0"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
                 >
-                  <Dialog.Panel className="w-full max-w-3xl bg-white shadow-[0_24px_80px_-20px_rgba(15,23,42,0.25)] border border-slate-200 border-t-[3px] border-t-[#ed1c24] transition-all overflow-hidden">
-
-                    {/* Modal header — Swiss style */}
+                  <Dialog.Panel className="w-full max-w-3xl overflow-hidden border border-t-[3px] border-slate-200 border-t-[#f26a21] bg-white shadow-[0_24px_80px_-20px_rgba(15,23,42,0.25)] transition-all">
                     <div className="border-b border-slate-200 px-8 py-6">
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="dcota-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ed1c24] mb-2">
+                          <p className="dcota-mono mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#f26a21]">
                             {modalState.type === 'create' ? 'New Entry' : 'Edit Mode'} · Users
                           </p>
-                          <Dialog.Title className="text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                          <Dialog.Title className="text-3xl font-extrabold leading-tight tracking-tight text-slate-900">
                             {modalState.type === 'create' ? 'Tambah User Baru' : 'Perbarui Akun'}
                           </Dialog.Title>
                         </div>
                         <button
-                          onClick={() => setModalState((prev) => ({ ...prev, isOpen: false }))}
-                          className="flex h-9 w-9 items-center justify-center text-slate-400 hover:bg-[#ed1c24] hover:text-white transition-colors -mr-2 -mt-1"
+                          onClick={closeModal}
+                          className="-mr-2 -mt-1 flex h-9 w-9 items-center justify-center text-slate-400 transition-colors hover:bg-[#f26a21] hover:text-white"
                           aria-label="Tutup"
                         >
                           <XMarkIcon className="h-5 w-5" strokeWidth={2} />
@@ -1019,17 +1060,20 @@ export default function AdminUsersPage() {
                       </div>
                     </div>
 
-                    {/* Modal body */}
                     <div className="px-8 py-8">
                       <UserForm
-                        buttonText={modalState.type === 'create' ? 'Buat Sekarang' : 'Simpan Perubahan'}
+                        buttonText={
+                          modalState.type === 'create' ? 'Buat Sekarang' : 'Simpan Perubahan'
+                        }
                         initialData={modalState.user}
                         roles={roles}
                         divisions={divisions}
                         picOmis={picOmis}
                         isLoading={isLoading}
-                        onClose={() => setModalState((prev) => ({ ...prev, isOpen: false }))}
-                        onSubmit={modalState.type === 'create' ? handleCreateUser : handleUpdateUser}
+                        onClose={closeModal}
+                        onSubmit={
+                          modalState.type === 'create' ? handleCreateUser : handleUpdateUser
+                        }
                       />
                     </div>
                   </Dialog.Panel>
@@ -1040,21 +1084,5 @@ export default function AdminUsersPage() {
         </Transition>
       </div>
     </>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   STAT BLOCK — angka raksasa, label kecil
-───────────────────────────────────────────── */
-function StatBlock({ label, value, code, accent }) {
-  return (
-    <div className="border-r border-slate-200 last:border-r-0 pl-6 lg:pl-8 py-2">
-      <div className="dcota-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-slate-400 mb-2">
-        {code} · {label}
-      </div>
-      <div className={`text-5xl lg:text-6xl font-extrabold tracking-tight leading-none ${accent ? 'text-[#ed1c24]' : 'text-slate-900'}`}>
-        {String(value).padStart(2, '0')}
-      </div>
-    </div>
   );
 }
