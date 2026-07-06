@@ -62,7 +62,7 @@ export async function POST(request, context) {
       const target = getRoutingTarget(kategori);
 
 
-        if (!target) throw new Error(`Mapping routing tidak ditemukan untuk sub kategori: ${subKategori}`);
+        if (!target) throw new Error(`Mapping routing tidak ditemukan untuk kategori: ${kategori}`);
 
         targetAM = await tx.user.findFirst({
           where: {

@@ -1,149 +1,154 @@
-# Dcota Care - Helpdesk & Approval Management System
+<div align="center">
 
-Dcota Care is an enterprise helpdesk and approval management system currently under active development.
+<img src="public/dcota-logo.png" alt="Dcota Care" width="120" />
 
-The system is designed to support internal operational workflows such as ticket submission, approval handling, assignment tracking, role-based access control, activity logging, file attachment handling, and operational reporting.
+# Dcota Care
 
-## Project Status
+**Internal Helpdesk & Approval Management System**
 
-🚧 **In Development**
+An end-to-end ticketing platform — from submission and triage through a multi-level approval chain — designed to be fast, auditable, and role-aware.
 
-This project is currently being developed and improved. Features, workflows, database schema, and UI components may change as the system evolves.
+<p>
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white" />
+  <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" />
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-Prisma%20ORM-4169E1?logo=postgresql&logoColor=white" />
+  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?logo=tailwindcss&logoColor=white" />
+  <img alt="NextAuth" src="https://img.shields.io/badge/Auth-NextAuth.js-000?logo=auth0&logoColor=white" />
+  <img alt="Vercel" src="https://img.shields.io/badge/Deploy-Vercel-000000?logo=vercel&logoColor=white" />
+  <img alt="Status" src="https://img.shields.io/badge/status-in%20production-success" />
+</p>
 
-## Overview
+</div>
 
-Dcota Care is built to help internal teams manage operational requests through a structured ticketing and approval workflow.
+---
 
-The application enables users to submit tickets, attach supporting files, track request status, assign tickets to responsible users, and maintain an activity log for each ticket.
+## 📖 Overview
 
-## Key Features
+**Dcota Care** is a production internal web application that manages operational requests through a structured ticketing and approval workflow. Users submit tickets, attach supporting files, and track status in real time, while every state transition is recorded as a complete audit trail.
 
-- User authentication
-- Role-based access control (RBAC)
-- User, role, and division management
-- Ticket submission and tracking
-- Ticket category and subcategory support
-- Ticket assignment workflow
-- PIC / handler relationship support
-- Approval and status management
-- Ticket activity logs and audit trail
-- File attachment support
-- Email notification support
-- Reporting and analytics integration
-- Database indexing for frequently queried fields
-- Responsive web interface
+It is a full-stack application built on the **Next.js App Router** with a **PostgreSQL** database (via Prisma), role-based access control (**RBAC**), attachment storage on **Cloudflare R2**, and analytics powered by **Google BigQuery**. The system is currently deployed on Vercel and serves internal sales & operations teams (~500 users).
 
-## Tech Stack
+> The user-facing interface is written in **Indonesian**, serving an Indonesian sales organization.
 
-### Frontend
+## ✨ Key Features
 
-- Next.js
-- React
-- Tailwind CSS
-- Radix UI
-- Headless UI
-- Heroicons
-- Lucide React
-- Sonner
+- 🔐 **Authentication & RBAC** — credentials-based login with 9 distinct roles
+- 🎫 **Ticket submission & tracking** — categories, sub-categories, attachments, store metadata
+- 🔀 **Smart triage** — classification into *Request* or *Feedback* paths
+- ✅ **Multi-level approval chain** — Sales Manager → Acting Manager → Acting PIC
+- 🗺️ **Category-based routing** — tickets are routed to the correct division automatically
+- 📎 **File attachments** — direct-to-storage uploads via presigned URLs (Cloudflare R2)
+- 📧 **Email notifications** — automatic assignment alerts over SMTP
+- 📊 **Analytics** — scheduled sync to BigQuery for reporting dashboards
+- 📝 **Audit trail** — every action is written to an immutable ticket log
 
-### Backend
+## 🛠️ Tech Stack
 
-- Next.js server-side logic
-- NextAuth
-- Prisma ORM
-- bcryptjs
-- Nodemailer
+| Category | Technology |
+| --- | --- |
+| **Framework** | Next.js 16 (App Router), React 19 |
+| **Styling & UI** | Tailwind CSS 4, Headless UI, Heroicons, Lucide, Sonner |
+| **Authentication** | NextAuth.js (Credentials + JWT), bcryptjs |
+| **Database & ORM** | PostgreSQL, Prisma (with Accelerate) |
+| **Storage** | Cloudflare R2 (S3-compatible) via a Go serverless function |
+| **Email** | Nodemailer (SMTP) |
+| **Analytics** | Google BigQuery |
+| **Deployment** | Vercel (+ Vercel Cron) |
 
-### Database & Storage
+## 🔄 Ticket Lifecycle
 
-- PostgreSQL
-- Prisma Client
-- S3-compatible object storage
-- Google BigQuery integration
+```mermaid
+flowchart LR
+    A["Salesman / Agent<br/>Submit Ticket"] --> B{"PIC OMI<br/>Triage"}
+    B -->|Request| C["Sales Manager"]
+    C --> D["Acting Manager"]
+    D --> E["Acting PIC"]
+    E -->|Complete| F(["Done"])
+    E -.->|Return| D
+    B -->|Feedback| G["User Feedback<br/>Bookmark / Archive"]
+```
 
-### Tooling
+Each ticket moves through a chain of *assignments*, and every transition writes a log entry — so the full history of any request is always traceable.
 
-- ESLint
-- PostCSS
-- npm
-- Vercel configuration
+## 👥 User Roles
 
-## Core Modules
+| Role | Responsibility |
+| --- | --- |
+| **Administrator** | User & master-data management, analytics |
+| **Salesman / Agent** | Submit tickets |
+| **PIC OMI / PIC OMI (SS)** | Triage tickets (Request / Feedback) |
+| **Sales Manager** | First-level approval |
+| **Acting Manager** | Division-level approval (routed per category) |
+| **Acting PIC** | Final resolution or return to manager |
+| **User Feedback** | Handle feedback-type tickets |
 
-### Authentication & Authorization
+## 🏗️ Architecture Highlights
 
-The system includes login-based authentication and role-based access control to separate permissions across internal user roles.
+- **Per-route authorization** — every API route enforces its own role check against the session, keeping authorization explicit and colocated with each endpoint.
+- **Assignment-driven lifecycle** — a user's work queue is simply their *pending* assignments; status transitions are append-only and fully logged.
+- **Category → division smart routing** — a single mapping layer decides which Acting Manager / Acting PIC division handles each ticket.
+- **Presigned uploads** — a lightweight Go serverless function issues time-limited PUT URLs to R2, so file bytes never pass through the app server.
+- **Non-blocking side effects** — emails and follow-up assignments are dispatched after the main transaction, never blocking the response path.
+- **Scheduled analytics sync** — a Vercel Cron job pushes ticket data to BigQuery for the reporting layer.
 
-### User & Division Management
-
-Users can be associated with roles, divisions, status, and PIC / handler relationships to support internal operational workflows.
-
-### Ticket Management
-
-Users can submit and manage tickets with title, category, subcategory, description, contact information, store information, and status tracking.
-
-### Assignment Workflow
-
-Tickets can be assigned to responsible users with assignment type and assignment status tracking.
-
-### Activity Logs
-
-Each ticket can maintain an activity log containing actor information, action type, notes, and timestamp.
-
-### Attachment Handling
-
-Ticket details support attachment metadata through JSON-based storage, allowing the system to associate uploaded files with ticket records.
-
-### Reporting & Analytics
-
-The project includes integration support for analytics and reporting workflows using Google BigQuery.
-
-## Database Design
-
-The database is designed around the following core entities:
-
-- `User`
-- `Role`
-- `Division`
-- `Ticket`
-- `TicketDetail`
-- `TicketAssignment`
-- `TicketLog`
-
-Indexes are added to frequently accessed fields such as role, division, PIC handler, ticket submitter, ticket type, ticket status, actor, and assignment status to improve query performance.
-
-## Architecture Highlights
-
-- Full-stack web application using Next.js
-- Relational database design using PostgreSQL and Prisma ORM
-- RBAC-based authorization model
-- Ticket lifecycle tracking with activity logs
-- Assignment-based workflow for operational follow-up
-- File attachment metadata support
-- Email notification support
-- Analytics integration using Google BigQuery
-- Production-oriented architecture under active development
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-Make sure you have the following installed:
-
-- Node.js
-- npm
+- Node.js & npm
 - PostgreSQL
-
-## Author
-
-Andre Marshandito  
-Software Engineer  
-GitHub: https://github.com/xxndrew-mr
 
 ### Installation
 
-Clone the repository:
-
 ```bash
+# 1. Clone the repository
 git clone https://github.com/xxndrew-mr/dcota-care.git
 cd dcota-care
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment (Postgres, NextAuth, SMTP, R2, BigQuery)
+cp .env.example .env
+
+# 4. Set up the database
+npx prisma migrate dev      # run migrations
+npx prisma generate         # generate Prisma Client
+npx prisma db seed          # seed roles, divisions & initial users
+
+# 5. Start the development server
+npm run dev                 # http://localhost:3000
+```
+
+### Other Commands
+
+```bash
+npm run build               # production build
+npx eslint .                # lint
+node scripts/etl-to-bigquery.js   # manual ETL to BigQuery
+```
+
+## 📁 Project Structure
+
+```
+src/
+  app/
+    login/            Login page
+    dashboard/        Protected pages (submit, queue, my-tickets, admin, …)
+    api/              Route handlers (auth, tickets, assignments, admin, cron)
+  lib/                Prisma, auth, smart routing, email, utils
+  middleware.js       Guards /dashboard/* pages
+prisma/               schema.prisma, migrations, seed
+api/go-upload.go      Vercel Go function: presigned R2 upload URLs
+```
+
+## 👤 Author
+
+**Andre Marshandito** — Software Engineer
+GitHub: [@xxndrew-mr](https://github.com/xxndrew-mr)
+
+---
+
+<div align="center">
+<sub>Built with Next.js, Prisma & PostgreSQL — deployed on Vercel.</sub>
+</div>

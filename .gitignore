@@ -44,7 +44,5 @@ next-env.d.ts
 service-account-key.json
 uploader-creden.json
 
-# Golang
-upload-service/.env
-upload-service/upload-service # Jika kamu build menjadi binary
-upload-service/*.exe # Jika kamu build di Windows
+# Golang (api/go-upload.go runs as a Vercel function; ignore local build output)
+*.exe

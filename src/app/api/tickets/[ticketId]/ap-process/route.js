@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
 import { sendTicketAssignedEmail } from '@/lib/email';
+import { getRoutingTarget } from '@/lib/smartRouting';
 
 // FUNGSI: Acting PIC memproses tiket (Complete, Return).
 export async function POST(request, context) {
@@ -71,10 +72,22 @@ export async function POST(request, context) {
           data: { status: 'Done' },
         });
       } else if (action === 'return') {
-        const actingManagerUser = await tx.user.findFirst({
-          where: { role: { role_name: 'Acting Manager' } },
+        const ticket = await tx.ticket.findUnique({
+          where: { ticket_id: BigInt(ticketId) },
         });
-        if (!actingManagerUser) throw new Error('User Acting Manager tidak ditemukan.');
+        if (!ticket) throw new Error('Tiket tidak ditemukan.');
+
+        const target = getRoutingTarget(ticket.kategori);
+        if (!target) throw new Error(`Mapping routing tidak ditemukan untuk kategori: ${ticket.kategori}`);
+
+        const actingManagerUser = await tx.user.findFirst({
+          where: {
+            role: { role_name: 'Acting Manager' },
+            division: { division_name: target.am_division },
+            status: 'Active',
+          },
+        });
+        if (!actingManagerUser) throw new Error(`User Acting Manager untuk ${target.am_division} tidak ditemukan.`);
 
         await tx.ticketAssignment.create({
           data: {
@@ -85,9 +98,7 @@ export async function POST(request, context) {
           },
         });
 
-        updatedTicket = await tx.ticket.findUnique({
-          where: { ticket_id: BigInt(ticketId) },
-        });
+        updatedTicket = ticket;
       }
 
       submitter = await tx.user.findUnique({
