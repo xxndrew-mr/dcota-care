@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "dev:go": "cd upload-service && go run main.go",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:go\""
+    "lint": "eslint ."
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -38,7 +36,6 @@
     "@types/node": "25.3.3",
     "@types/react": "19.2.14",
     "babel-plugin-react-compiler": "1.0.0",
-    "concurrently": "^10.0.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "tailwindcss": "^4",

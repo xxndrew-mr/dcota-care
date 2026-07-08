@@ -4,7 +4,17 @@ import prisma from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function GET() {
+export async function GET(request) {
+  // Proteksi endpoint: Vercel Cron otomatis mengirim header
+  // `Authorization: Bearer <CRON_SECRET>` jika env CRON_SECRET diset di project.
+  // Cek hanya aktif saat CRON_SECRET ada, jadi aman di-deploy sebelum/sesudah env diset.
+  if (process.env.CRON_SECRET) {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return Response.json({ success: false, message: 'Tidak diizinkan' }, { status: 401 });
+    }
+  }
+
   try {
     console.log("=== SYNC BIGQUERY START ===");
 
