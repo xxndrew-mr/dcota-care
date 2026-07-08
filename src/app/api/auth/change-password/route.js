@@ -11,6 +11,17 @@ export async function POST(request) {
     return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
   }
 
+  // === DINONAKTIFKAN ATAS PERMINTAAN DIREKSI ===
+  // Fitur ganti password dimatikan khusus untuk akun Salesman.
+  // Logika di bawah sengaja TIDAK dihapus — hapus blok ini untuk mengaktifkan kembali.
+  if (session.user.role === 'Salesman') {
+    return NextResponse.json(
+      { message: 'Fitur ganti password dinonaktifkan untuk akun Salesman.' },
+      { status: 403 }
+    );
+  }
+  // === END NONAKTIF ===
+
   try {
     const { currentPassword, newPassword } = await request.json();
 

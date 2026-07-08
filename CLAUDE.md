@@ -59,7 +59,7 @@ Copy `.env.example` to `.env` before running (Postgres, NextAuth, SMTP, Cloudfla
 
 ## Architecture
 
-Plain JavaScript (`.js`/`.jsx`, not TypeScript) with `@/*` aliased to `./src/*`. UI is built directly with `@headlessui/react` (Dialog/Transition/Menu), `@heroicons/react` + `lucide-react` icons, and raw Tailwind CSS 4; Sonner for toasts. `cn()` from [src/lib/utils.js](src/lib/utils.js) merges classes. (A shadcn/ui `components.json` exists but no generated components are used.)
+Plain JavaScript (`.js`/`.jsx`, not TypeScript) with `@/*` aliased to `./src/*`. UI is built directly with `@headlessui/react` (Dialog/Transition/Menu), `@heroicons/react` + `lucide-react` icons, and raw Tailwind CSS 4; Sonner for toasts. `cn()` from [src/lib/utils.js](src/lib/utils.js) merges classes.
 
 ### Auth & authorization
 

@@ -258,23 +258,27 @@ export default function DashboardLayout({ children }) {
                     </div>
 
                     <div className="divide-y divide-slate-100">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            href="/dashboard/change-password"
-                            className={cn(
-                              "flex items-center justify-between gap-3 px-5 py-3.5 text-[13px] font-semibold transition-colors",
-                              active ? "bg-slate-50 text-slate-900" : "text-slate-700"
-                            )}
-                          >
-                            <span className="flex items-center gap-3">
-                              <KeyIcon className="h-4 w-4" strokeWidth={2} />
-                              Ganti Password
-                            </span>
-                            <span className="dcota-mono text-[10px] text-slate-300">→</span>
-                          </Link>
-                        )}
-                      </Menu.Item>
+                      {/* Ganti Password disembunyikan utk Salesman atas permintaan direksi.
+                          Hapus kondisi `userRole !== 'Salesman'` untuk mengaktifkan kembali. */}
+                      {userRole !== 'Salesman' && (
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              href="/dashboard/change-password"
+                              className={cn(
+                                "flex items-center justify-between gap-3 px-5 py-3.5 text-[13px] font-semibold transition-colors",
+                                active ? "bg-slate-50 text-slate-900" : "text-slate-700"
+                              )}
+                            >
+                              <span className="flex items-center gap-3">
+                                <KeyIcon className="h-4 w-4" strokeWidth={2} />
+                                Ganti Password
+                              </span>
+                              <span className="dcota-mono text-[10px] text-slate-300">→</span>
+                            </Link>
+                          )}
+                        </Menu.Item>
+                      )}
                       <Menu.Item>
                         {({ active }) => (
                           <button
@@ -384,14 +388,18 @@ export default function DashboardLayout({ children }) {
 
                   {/* Footer actions */}
                   <div className="border-t border-slate-200 divide-y divide-slate-100">
-                    <Link
-                      href="/dashboard/change-password"
-                      onClick={() => setSidebarOpen(false)}
-                      className="flex items-center gap-3 px-6 py-4 text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-                    >
-                      <KeyIcon className="h-4 w-4" strokeWidth={2} />
-                      Ganti Password
-                    </Link>
+                    {/* Ganti Password disembunyikan utk Salesman atas permintaan direksi.
+                        Hapus kondisi `userRole !== 'Salesman'` untuk mengaktifkan kembali. */}
+                    {userRole !== 'Salesman' && (
+                      <Link
+                        href="/dashboard/change-password"
+                        onClick={() => setSidebarOpen(false)}
+                        className="flex items-center gap-3 px-6 py-4 text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                      >
+                        <KeyIcon className="h-4 w-4" strokeWidth={2} />
+                        Ganti Password
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-6 py-4 text-[13px] font-semibold text-[#f26a21] hover:bg-[#f26a21] hover:text-white transition-colors w-full"

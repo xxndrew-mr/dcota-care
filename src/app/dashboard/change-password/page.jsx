@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import {
   EyeIcon,
   EyeSlashIcon,
@@ -10,6 +11,7 @@ import {
 
 export default function ChangePasswordPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -64,6 +66,40 @@ export default function ChangePasswordPage() {
       setIsLoading(false);
     }
   };
+
+  // === DINONAKTIFKAN ATAS PERMINTAAN DIREKSI ===
+  // Fitur ganti password dimatikan khusus untuk akun Salesman.
+  // Hapus blok ini untuk mengaktifkan kembali.
+  if (session?.user?.role === 'Salesman') {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-10">
+        <div className="mb-6 flex items-center gap-3">
+          <span className="bg-red-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-white">
+            Akun
+          </span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+            Dcota Care / Keamanan
+          </span>
+        </div>
+        <div className="border-l-4 border-amber-500 bg-amber-50 px-5 py-6">
+          <p className="text-sm font-bold uppercase tracking-wide text-amber-900">
+            Fitur Dinonaktifkan
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-amber-900">
+            Fitur ganti password tidak tersedia untuk akun Salesman. Silakan
+            hubungi Administrator jika Anda perlu mengubah kata sandi.
+          </p>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="mt-5 bg-red-600 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-red-700"
+          >
+            Kembali ke Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+  // === END NONAKTIF ===
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
