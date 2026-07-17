@@ -15,6 +15,8 @@ import {
   History,
   MessageSquare,
   ArrowUpRight,
+  Bookmark,
+  Archive,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -36,13 +38,10 @@ export default function DashboardPage() {
 
   const isAdmin = role === "Administrator";
   const isSalesAgen = ["Salesman", "Agen"].includes(role);
-  const isPIC = ["PIC OMI", "PIC OMI (SS)", "Acting PIC"].includes(role);
-  const isManagerPlus = [
-    "Sales Manager",
-    "Acting Manager",
-    "User Feedback",
-    "Viewer",
-  ].includes(role);
+  const isPIC = ["PIC OMI", "PIC OMI (SS)"].includes(role);
+  const isApprover = ["Sales Manager", "Acting Manager", "Acting PIC"].includes(role);
+  const isUserFeedback = role === "User Feedback";
+  const isViewer = role === "Viewer";
 
   const getMenuCards = () => {
     if (isAdmin) {
@@ -102,8 +101,8 @@ export default function DashboardPage() {
       ];
     }
 
-    if (isManagerPlus) {
-      return [
+    if (isApprover) {
+      const cards = [
         {
           href: "/dashboard/queue",
           code: "01",
@@ -118,6 +117,65 @@ export default function DashboardPage() {
           desc: "Tinjau performa tugas selesai.",
           icon: History,
         },
+      ];
+
+      // Halaman feedback hanya tersedia untuk Sales Manager di grup ini
+      // (lihat FEEDBACK_ALLOWED di layout dashboard).
+      if (role === "Sales Manager") {
+        cards.push({
+          href: "/dashboard/feedback",
+          code: "03",
+          title: "Analisis Feedback",
+          desc: "Evaluasi kualitas layanan.",
+          icon: MessageSquare,
+        });
+      }
+
+      return cards;
+    }
+
+    if (isUserFeedback) {
+      return [
+        {
+          href: "/dashboard/feedback",
+          code: "01",
+          title: "Antrian Feedback",
+          desc: "Review feedback yang masuk.",
+          icon: MessageSquare,
+        },
+        {
+          href: "/dashboard/bookmarks",
+          code: "02",
+          title: "Bookmark",
+          desc: "Feedback yang ditandai penting.",
+          icon: Bookmark,
+        },
+        {
+          href: "/dashboard/archive",
+          code: "03",
+          title: "Arsip",
+          desc: "Feedback yang telah diarsipkan.",
+          icon: Archive,
+        },
+      ];
+    }
+
+    if (isViewer) {
+      return [
+        {
+          href: "/dashboard/history",
+          code: "01",
+          title: "Riwayat Tiket",
+          desc: "Pantau seluruh riwayat penanganan.",
+          icon: History,
+        },
+        {
+          href: "/dashboard/admin/analytics",
+          code: "02",
+          title: "Analytics",
+          desc: "Monitoring data BigQuery real-time.",
+          icon: BarChart3,
+        },
         {
           href: "/dashboard/feedback",
           code: "03",
@@ -127,6 +185,7 @@ export default function DashboardPage() {
         },
       ];
     }
+
     return [];
   };
 
@@ -145,15 +204,9 @@ export default function DashboardPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
-        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-
         .hairline-b { border-bottom: 1px solid rgba(15,23,42,0.08); }
         .hairline-t { border-top: 1px solid rgba(15,23,42,0.08); }
 
-        /* Headline dikecilkan sedikit agar tidak overwhelming = lebih ramah baca */
         .display-headline {
           font-size: clamp(48px, 8vw, 104px);
           line-height: 0.94;
@@ -188,9 +241,8 @@ export default function DashboardPage() {
             {/* Eyebrow */}
             <div className="grid grid-cols-12 gap-6 mb-10 lg:mb-12">
               <div className="col-span-12 dcota-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-400 flex flex-wrap items-center gap-3">
-                {/* tag role diberi blok oranye agar dominan & jelas */}
                 <span className="bg-[#f26a21] text-white px-2 py-1 font-semibold tracking-[0.2em]">
-                  {isAdmin ? "ADMIN" : isSalesAgen ? "FIELD" : isPIC ? "TRIAGE" : "REVIEW"}
+                  {isAdmin ? "ADMIN" : isSalesAgen ? "FIELD" : isPIC ? "TRIAGE" : isApprover ? "APPROVAL" : "REVIEW"}
                 </span>
                 <span className="text-slate-900 font-semibold">DCOTA CARE</span>
                 <span className="text-slate-300">/</span>
@@ -200,7 +252,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Headline */}
             <div className="grid grid-cols-12 gap-6 items-end">
               <h1 className="col-span-12 lg:col-span-8 display-headline">
                 Halo,
@@ -217,7 +268,8 @@ export default function DashboardPage() {
                   {isAdmin && "Kontrol penuh atas infrastruktur dan pengguna sistem."}
                   {isSalesAgen && "Setiap laporan Anda menjadi bahan keputusan tim manajemen."}
                   {isPIC && "Prioritaskan label urgent untuk menjaga kualitas layanan."}
-                  {isManagerPlus && "Tinjau tren feedback mingguan untuk evaluasi divisi."}
+                  {isApprover && "Tindak lanjuti antrian tugas Anda agar layanan tetap terjaga."}
+                  {(isUserFeedback || isViewer) && "Tinjau tren feedback mingguan untuk evaluasi divisi."}
                 </p>
                 {menuCards[0] && (
                   <Link
@@ -251,7 +303,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* ═══════════ MENU GRID — baris hairline, lebih jelas bisa diklik ═══════════ */}
         <div className="hairline-b w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
           <div className="mx-auto max-w-7xl">
 
@@ -263,7 +314,6 @@ export default function DashboardPage() {
                   }`}
               >
                 <div className="grid grid-cols-12 gap-4 lg:gap-6 py-7 lg:py-8 items-center relative">
-                  {/* bar oranye penanda hover di kiri */}
                   <span className="absolute left-0 lg:-left-12 top-1/2 -translate-y-1/2 h-10 w-1 bg-[#f26a21] opacity-0 group-hover:opacity-100 transition-opacity" />
 
                   {/* Code */}
@@ -271,7 +321,6 @@ export default function DashboardPage() {
                     {card.code}
                   </div>
 
-                  {/* Icon dalam kotak — affordance lebih jelas */}
                   <div className="col-span-2 lg:col-span-1 flex justify-start">
                     <span className="flex items-center justify-center w-11 h-11 border border-slate-200 group-hover:border-[#f26a21] group-hover:bg-[#f26a21] transition-all duration-200">
                       <card.icon
@@ -298,7 +347,6 @@ export default function DashboardPage() {
                     </p>
                   </div>
 
-                  {/* Arrow + label "Buka" agar jelas aksinya */}
                   <div className="col-span-3 lg:col-span-2 flex items-center justify-end gap-2">
                     <span className="hidden lg:inline dcota-mono text-[10.5px] uppercase tracking-[0.18em] text-slate-400 group-hover:text-[#f26a21] transition-colors">
                       Buka

@@ -39,8 +39,6 @@ export default function LoginPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
         *, *::before, *::after { box-sizing: border-box; }
 
         .lp-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -273,7 +271,6 @@ export default function LoginPage() {
       <div className="lp-page lp-sans">
         <div className="lp-card">
 
-          {/* ── LEFT PANEL ── */}
           <div className="lp-left">
             <div className="lp-left-bg" />
             <div className="lp-left-overlay" />
@@ -300,7 +297,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* ── RIGHT PANEL ── */}
           <div className="lp-right">
 
             {/* Logo-lockup — tampil di mobile saat panel kiri disembunyikan */}
@@ -339,7 +335,6 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {/* Username */}
               <div>
                 <label htmlFor="username" className="lp-label">Username</label>
                 <div className="lp-input-wrap">
@@ -357,7 +352,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Password */}
               <div>
                 <label htmlFor="password" className="lp-label">Password</label>
                 <div className="lp-input-wrap">
@@ -384,7 +378,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Submit */}
               <button className="lp-btn" disabled={isLoading} type="submit">
                 {isLoading ? (
                   <>

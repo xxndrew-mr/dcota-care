@@ -23,7 +23,7 @@ model Division {
 model User {
   user_id          Int                @id @default(autoincrement())
   name             String
-  phone            String?            // 🆕 nomor telp user (diisi admin)
+  phone            String?            // nomor telp user (diisi admin)
   email            String?            @unique
   password         String
   username         String             @unique

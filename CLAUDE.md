@@ -31,7 +31,8 @@ src/
       cron/sync-bigquery/ #   Dipanggil Vercel Cron tiap menit
   lib/                    # prisma (singleton), auth (NextAuth options),
                           # smartRouting (map kategori→divisi),
-                          # email + email-template, utils (cn)
+                          # email + email-template, utils (cn),
+                          # serialize (BigInt→string), format (tanggal id-ID)
   middleware.js           # Proteksi halaman /dashboard/*
 prisma/                   # schema.prisma, migrations/, seed.js
 api/go-upload.go          # Go Vercel function: presigned URL upload ke R2
@@ -45,6 +46,8 @@ vercel.json               # Jadwal cron sync-bigquery
 npm run dev              # Next.js dev server (http://localhost:3000)
 npm run build            # Production build
 npm run lint             # ESLint (eslint-config-next)
+npm test                 # Unit tests (Vitest, src/**/*.test.js)
+npm run test:watch       # Vitest watch mode
 
 npx prisma migrate dev   # Create/apply migrations (uses DATABASE_URL + DIRECT_URL)
 npx prisma generate      # Regenerate client after schema changes
@@ -53,13 +56,13 @@ npx prisma db seed       # Runs prisma/seed.js (roles, divisions, admin + routin
 node scripts/etl-to-bigquery.js   # Manual ETL run to BigQuery
 ```
 
-There is no test framework configured. Note: `npm run dev:go` references an `upload-service/` directory that does not exist — the Go code actually lives at `api/go-upload.go` and runs as a Vercel serverless function, not locally.
+Unit tests (Vitest) live in `src/lib/__tests__/` and cover the pure lib modules; API routes have no test coverage yet. CI (`.github/workflows/ci.yml`) runs lint + tests + build + `go vet`/`go build` on push/PR. The Go code lives at `api/go-upload.go` and runs as a Vercel serverless function, not locally.
 
-Copy `.env.example` to `.env` before running (Postgres, NextAuth, SMTP, Cloudflare R2, GCP BigQuery, Google Drive credentials).
+Copy `.env.example` to `.env` before running (Postgres, NextAuth, SMTP, Cloudflare R2, GCP BigQuery, Looker Studio URL). Note: `R2_ENDPOINT` and `R2_PUBLIC_URL` are required for uploads (the Go function fails fast without them); `SEED_DEFAULT_PASSWORD`/`IMPORT_DEFAULT_PASSWORD` override the seeded/imported account passwords.
 
 ## Architecture
 
-Plain JavaScript (`.js`/`.jsx`, not TypeScript) with `@/*` aliased to `./src/*`. UI is built directly with `@headlessui/react` (Dialog/Transition/Menu), `@heroicons/react` + `lucide-react` icons, and raw Tailwind CSS 4; Sonner for toasts. `cn()` from [src/lib/utils.js](src/lib/utils.js) merges classes.
+Plain JavaScript (`.js`/`.jsx`, not TypeScript) with `@/*` aliased to `./src/*`. UI is built directly with `@headlessui/react` (Dialog/Transition/Menu), `@heroicons/react` + `lucide-react` icons, and raw Tailwind CSS 4. `cn()` from [src/lib/utils.js](src/lib/utils.js) merges classes.
 
 ### Auth & authorization
 
@@ -78,7 +81,7 @@ Tickets move through a chain of `TicketAssignment` rows (assignment_type `Active
 
 ### Cross-cutting conventions
 
-- **BigInt IDs**: `Ticket`, `TicketLog`, `TicketAssignment` use BigInt primary keys — they cannot be JSON-serialized directly; routes convert with a custom serializer (see `serialize()` in [src/app/api/tickets/submit/route.js](src/app/api/tickets/submit/route.js)) and cast route params with `BigInt(...)`.
+- **BigInt IDs**: `Ticket`, `TicketLog`, `TicketAssignment` use BigInt primary keys — they cannot be JSON-serialized directly; routes convert with `serialize()` from [src/lib/serialize.js](src/lib/serialize.js) and cast route params with `BigInt(...)`.
 - **Prisma client**: import the singleton from `@/lib/prisma` (uses the Accelerate extension); never instantiate `PrismaClient` in routes.
 - **Emails and follow-up assignments are fire-and-forget**: sent after the main transaction with `.catch(console.error)`, never awaited in the response path ([src/lib/email.js](src/lib/email.js), nodemailer/SMTP).
 - **File uploads**: [api/go-upload.go](api/go-upload.go) (Go, Vercel function) issues presigned PUT URLs to Cloudflare R2; tickets store only attachment metadata in `TicketDetail.attachments_json`.

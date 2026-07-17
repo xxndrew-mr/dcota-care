@@ -387,10 +387,6 @@ export default function MyTicketsPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }

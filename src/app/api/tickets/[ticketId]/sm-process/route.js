@@ -1,11 +1,9 @@
-// Lokasi: src/app/api/tickets/[ticketId]/sm-process/route.js
-
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
 import { getRoutingTarget } from '@/lib/smartRouting';
-import { sendTicketAssignedEmail } from '@/lib/email'; // <-- Import Logika Mapping
+import { sendTicketAssignedEmail } from '@/lib/email';
 
 export async function POST(request, context) {
   const session = await getServerSession(authOptions);
@@ -35,15 +33,20 @@ export async function POST(request, context) {
   if (!notes) return NextResponse.json({ message: 'Catatan wajib.' }, { status: 400 });
 
   const currentAssignment = await prisma.ticketAssignment.findFirst({
-    where: { ticket_id: BigInt(ticketId), user_id: session.user.id, status: 'Pending' },
+    where: {
+      ticket_id: BigInt(ticketId),
+      user_id: session.user.id,
+      status: 'Pending',
+      assignment_type: 'Active',
+    },
     include: { ticket: true }
   });
 
   if (!currentAssignment) return NextResponse.json({ message: 'Tugas tidak ditemukan.' }, { status: 403 });
 
   try {
-    let updatedTicket = null; // <- Perubahan 1: definisi updatedTicket
-    let targetAM = null;     // <- Perubahan 2: definisi targetAM
+    let updatedTicket = null;
+    let targetAM = null;
 
     const result = await prisma.$transaction(async (tx) => {
       await tx.ticketAssignment.delete({ where: { assignment_id: currentAssignment.assignment_id } });
@@ -58,9 +61,8 @@ export async function POST(request, context) {
       });
 
       if (action === 'approve') {
-       const kategori = currentAssignment.ticket.kategori;
-      const target = getRoutingTarget(kategori);
-
+        const kategori = currentAssignment.ticket.kategori;
+        const target = getRoutingTarget(kategori);
 
         if (!target) throw new Error(`Mapping routing tidak ditemukan untuk kategori: ${kategori}`);
 
@@ -96,14 +98,14 @@ export async function POST(request, context) {
         });
       }
 
-      return { updatedTicket, targetAM }; // <- Perubahan 3: return variabel yg sudah didefinisikan
+      return { updatedTicket, targetAM };
     });
 
     if (action === 'approve' && result.targetAM?.email) {
       sendTicketAssignedEmail({
         to: result.targetAM.email,
         subject: `[Helpdesk GT] Pending Request (#${ticketId}) - Menunggu approval Manager`,
-        ticket: result.updatedTicket,
+        ticket: currentAssignment.ticket,
         extraText: `Request telah di-approve oleh Sales Manager dan menunggu keputusan Anda.`,
       }).catch((err) => console.error('Gagal kirim email SM→AM:', err));
     }

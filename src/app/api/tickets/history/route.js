@@ -1,19 +1,9 @@
-// Lokasi: src/app/api/tickets/history/route.js
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
+import { serialize } from '@/lib/serialize';
 
-const serialize = (data) =>
-  JSON.parse(
-    JSON.stringify(data, (_, value) =>
-      typeof value === 'bigint' ? value.toString() : value
-    )
-  );
-
-// ================================
-// GET HISTORY TICKETS (ROLE AWARE + MULTI DIVISI)
-// ================================
 export async function GET(request) {
   const session = await getServerSession(authOptions);
 
@@ -34,50 +24,41 @@ export async function GET(request) {
 
   let whereClause = {};
 
-  // =========================
-  // ROLE OPERASIONAL (AGEN, SALES, DLL)
-  // =========================
-  // =========================
-// ROLE PIC OMI (SS)
-// =========================
-if (userRole === 'PIC OMI (SS)') {
-  whereClause = {
-    logs: {
-      some: {
-        actor: {
-          role: {
-            role_name: 'PIC OMI (SS)',
+  // PIC OMI (SS): semua tiket yang pernah ditangani sesama PIC OMI (SS)
+  if (userRole === 'PIC OMI (SS)') {
+    whereClause = {
+      logs: {
+        some: {
+          actor: {
+            role: {
+              role_name: 'PIC OMI (SS)',
+            },
           },
         },
       },
-    },
-  };
-}
+    };
+  }
 
-// =========================
-// ROLE OPERASIONAL LAIN
-// =========================
-else if (userRole !== 'Viewer' && userRole !== 'Administrator') {
-  whereClause = {
-    logs: {
-      some: {
-        actor_user_id: userId,
+  // Role operasional lain: hanya tiket yang pernah dia proses sendiri
+  else if (userRole !== 'Viewer' && userRole !== 'Administrator') {
+    whereClause = {
+      logs: {
+        some: {
+          actor_user_id: userId,
+        },
       },
-    },
-  };
-}
+    };
+  }
 
-  // =========================
-  // VIEWER / ADMIN → BOLEH FILTER DIVISI
-  // =========================
+  // Viewer/Administrator boleh memfilter per divisi
   if (
     (userRole === 'Viewer' || userRole === 'Administrator') &&
     divisionIds.length > 0
   ) {
     whereClause = {
       ...whereClause,
-      division_id: {
-        in: divisionIds,
+      submittedBy: {
+        division_id: { in: divisionIds },
       },
     };
   }
@@ -101,16 +82,16 @@ else if (userRole !== 'Viewer' && userRole !== 'Administrator') {
           },
         },
         logs: {
-  orderBy: { timestamp: 'desc' },
-  take: 1,
-  select: {
-    timestamp: true,
-    notes: true, // ✅ tambahkan ini
-    actor: {
-      select: { name: true },
-    },
-  },
-},
+          orderBy: { timestamp: 'desc' },
+          take: 1,
+          select: {
+            timestamp: true,
+            notes: true,
+            actor: {
+              select: { name: true },
+            },
+          },
+        },
         assignments: {
           where: { status: 'Pending' },
           include: {
@@ -132,7 +113,7 @@ else if (userRole !== 'Viewer' && userRole !== 'Administrator') {
   } catch (error) {
     console.error('Gagal mengambil riwayat aksi:', error);
     return NextResponse.json(
-      { message: 'Gagal mengambil data.', error: error.message },
+      { message: 'Gagal mengambil data.' },
       { status: 500 }
     );
   }

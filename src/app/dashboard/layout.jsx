@@ -47,11 +47,6 @@ export default function DashboardLayout({ children }) {
   if (status === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white dcota-sans">
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-          .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-          .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-        `}</style>
         <div className="flex flex-col items-center gap-5">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#f26a21] border-t-transparent" />
           <p className="dcota-mono text-[10.5px] font-medium uppercase tracking-[0.22em] text-slate-400">
@@ -68,7 +63,7 @@ export default function DashboardLayout({ children }) {
     { href: '/dashboard', label: 'Dashboard', icon: HomeIcon, roles: ['Administrator', 'Salesman', 'Agen', 'PIC OMI', 'Sales Manager', 'Acting Manager', 'Acting PIC', 'User Feedback', 'Viewer', 'PIC OMI (SS)'] },
     { href: '/dashboard/submit', label: 'Submit', icon: DocumentPlusIcon, roles: ['Salesman', 'Agen'] },
     { href: '/dashboard/my-tickets', label: 'Riwayat', icon: TicketIcon, roles: ['Salesman', 'Agen'] },
-    { href: '/dashboard/queue', label: userRole === 'PIC OMI' ? 'Triase' : 'Antrian', icon: ClipboardDocumentListIcon, roles: ['PIC OMI', 'PIC OMI (SS)', 'Sales Manager', 'Acting Manager', 'Acting PIC'] },
+    { href: '/dashboard/queue', label: ['PIC OMI', 'PIC OMI (SS)'].includes(userRole) ? 'Triase' : 'Antrian', icon: ClipboardDocumentListIcon, roles: ['PIC OMI', 'PIC OMI (SS)', 'Sales Manager', 'Acting Manager', 'Acting PIC'] },
     { href: '/dashboard/history', label: 'History', icon: ClockIcon, roles: ['PIC OMI', 'PIC OMI (SS)', 'Sales Manager', 'Acting Manager', 'Acting PIC', 'Viewer'] },
     { href: '/dashboard/admin/users', label: 'Users', icon: UsersIcon, roles: ['Administrator'] },
     { href: '/dashboard/admin/analytics', label: 'Analytics', icon: ChartBarIcon, roles: ['Administrator', 'Viewer'] },
@@ -85,17 +80,8 @@ export default function DashboardLayout({ children }) {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-      `}</style>
-
       <div className="dcota-sans min-h-screen bg-white">
 
-        {/* ═══════════════════════════════════════════════════════════
-            NAVBAR — Swiss flat, hairline border, aksen oranye dominan
-        ═══════════════════════════════════════════════════════════ */}
         <header
           className={cn(
             "sticky top-0 z-40 w-full bg-white transition-shadow duration-300",
@@ -103,7 +89,6 @@ export default function DashboardLayout({ children }) {
             isScrolled && "shadow-[0_1px_0_0_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.08)]"
           )}
         >
-          {/* garis oranye tipis paling atas — pengikat identitas */}
           <div className="h-[3px] w-full bg-[#f26a21]" />
 
           <div className="mx-auto max-w-[1440px] flex h-16 items-center px-6 lg:px-12">
@@ -119,7 +104,6 @@ export default function DashboardLayout({ children }) {
               </button>
 
               <Link href="/dashboard" className="flex items-center gap-3 group">
-                {/* logo box oranye — warna brand dominan */}
                 <div className="flex h-9 w-9 items-center justify-center bg-[#f26a21] transition-colors duration-300">
                   <Image
                     src="/dcota-logo.png"
@@ -151,7 +135,7 @@ export default function DashboardLayout({ children }) {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "relative flex items-center gap-2 px-3.5 h-16 text-[13px] font-semibold tracking-tight transition-colors",
+                      "group relative flex items-center gap-2 px-3.5 h-16 text-[13px] font-semibold tracking-tight transition-colors",
                       active
                         ? "text-[#f26a21]"
                         : "text-slate-500 hover:text-slate-900"
@@ -159,7 +143,6 @@ export default function DashboardLayout({ children }) {
                   >
                     <item.icon className="h-4 w-4" strokeWidth={2} />
                     {item.label}
-                    {/* underline oranye: solid saat aktif, muncul saat hover */}
                     <span
                       className={cn(
                         "absolute left-3 right-3 -bottom-px h-[2.5px] bg-[#f26a21] origin-left transition-transform duration-300",
@@ -221,7 +204,6 @@ export default function DashboardLayout({ children }) {
 
               <Menu as="div" className="relative">
                 <Menu.Button className="flex items-center gap-3 group outline-none">
-                  {/* Avatar Swiss: kotak oranye dengan initial mono */}
                   <div className="flex h-9 w-9 items-center justify-center bg-[#f26a21] group-hover:bg-[#d4551a] transition-colors duration-300 dcota-mono text-[13px] font-bold text-white">
                     {initial}
                   </div>
@@ -304,9 +286,6 @@ export default function DashboardLayout({ children }) {
           </div>
         </header>
 
-        {/* ═══════════════════════════════════════════════════════════
-            MOBILE SIDEBAR — putih flat, match navbar
-        ═══════════════════════════════════════════════════════════ */}
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog as="div" className="relative z-50 md:hidden" onClose={setSidebarOpen}>
             <Transition.Child
@@ -328,7 +307,6 @@ export default function DashboardLayout({ children }) {
                 leaveFrom="translate-x-0" leaveTo="-translate-x-full"
               >
                 <Dialog.Panel className="dcota-sans relative flex w-full max-w-[320px] flex-col bg-white">
-                  {/* garis oranye pengikat identitas */}
                   <div className="h-[3px] w-full bg-[#f26a21]" />
 
                   {/* Sidebar header */}

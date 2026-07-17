@@ -2,36 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { BookmarkIcon, UserIcon } from '@heroicons/react/24/solid';
-import { CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/24/outline'; // <-- TAMBAHAN
-
-// Helper: format tanggal singkat
-const formatDate = (dateString) => {
-  if (!dateString) return '-';
-  return new Date(dateString).toLocaleString('id-ID', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
-
-// Helper: key & label bulan dari createdAt
-const getMonthKey = (dateString) => {
-  if (!dateString) return null;
-  const d = new Date(dateString);
-  const year = d.getFullYear();
-  const month = `${d.getMonth() + 1}`.padStart(2, '0'); // 01-12
-  return `${year}-${month}`;
-};
-
-const getMonthLabel = (dateString) => {
-  if (!dateString) return '-';
-  return new Date(dateString).toLocaleDateString('id-ID', {
-    month: 'long',
-    year: 'numeric',
-  });
-};
+import { CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/24/outline';
+import { formatDate, getMonthKey, getMonthLabel } from '@/lib/format';
 
 export default function BookmarksPage() {
   const [tickets, setTickets] = useState([]);
@@ -40,15 +12,15 @@ export default function BookmarksPage() {
 
   useEffect(() => {
     fetch('/api/tickets/bookmarks')
-      .then((res) => res.json())
-      .then((data) => {
-        setTickets(data);
-        setIsLoading(false);
+      .then((res) => {
+        if (!res.ok) throw new Error('Gagal mengambil data bookmark');
+        return res.json();
       })
-      .catch(() => setIsLoading(false));
+      .then((data) => setTickets(Array.isArray(data) ? data : []))
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  // Buat opsi bulan unik dari tickets
   const monthOptions = Array.from(
     new Map(
       tickets
@@ -60,10 +32,8 @@ export default function BookmarksPage() {
     ).entries()
   )
     .map(([value, label]) => ({ value, label }))
-    // urutkan dari terbaru ke lama
     .sort((a, b) => (a.value < b.value ? 1 : -1));
 
-  // Filter tiket berdasarkan bulan (kalau dipilih)
   const filteredTickets =
     monthFilter === 'all'
       ? tickets
@@ -80,7 +50,6 @@ export default function BookmarksPage() {
 
   return (
     <div className="px-4 py-6">
-      {/* HEADER */}
       <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-[#5c1602] via-[#dc2626] to-[#ed781e] px-6 py-6 shadow-lg">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -96,7 +65,6 @@ export default function BookmarksPage() {
             </p>
           </div>
 
-          {/* Filter Bulan */}
           <div className="mt-3 sm:mt-0">
             <div className="flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2 text-xs text-orange-50 backdrop-blur">
               <CalendarDaysIcon className="h-4 w-4" />
@@ -120,7 +88,6 @@ export default function BookmarksPage() {
         <div className="pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-white/20 blur-2xl" />
       </div>
 
-      {/* WRAPPER KONTEN */}
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between text-xs text-slate-500">
           <span>
@@ -148,7 +115,6 @@ export default function BookmarksPage() {
                 key={ticket.ticket_id}
                 className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm transition hover:border-indigo-200 hover:shadow-md"
               >
-                {/* Header kecil */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <h2 className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-indigo-700">
@@ -169,12 +135,10 @@ export default function BookmarksPage() {
                   <BookmarkIcon className="h-5 w-5 flex-shrink-0 text-yellow-400" />
                 </div>
 
-                {/* Deskripsi singkat */}
                 <p className="mt-3 line-clamp-3 rounded-xl bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-700">
                   {ticket.detail?.description || '(Tidak ada deskripsi)'}
                 </p>
 
-                {/* Lampiran */}
                 {ticket.detail?.attachments_json &&
                   Array.isArray(ticket.detail.attachments_json) &&
                   ticket.detail.attachments_json.length > 0 && (
@@ -202,7 +166,6 @@ export default function BookmarksPage() {
                     </div>
                   )}
 
-                {/* Footer info */}
                 <div className="mt-3 border-t border-dashed border-slate-200 pt-3 text-[11px] text-slate-500">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -220,7 +183,6 @@ export default function BookmarksPage() {
                     </div>
                   </div>
 
-                  {/* Info siapa saja yang bookmark */}
                   {ticket.assignments && ticket.assignments.length > 0 && (
                     <div className="mt-2 flex flex-wrap items-center gap-1">
                       <span className="text-[11px] text-slate-400">

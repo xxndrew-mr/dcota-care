@@ -1,119 +1,123 @@
-// scripts/etl-to-bigquery.js
-
+// ETL manual ke BigQuery — versi CLI dari /api/cron/sync-bigquery.
+// Skema, kredensial (env GCP_*), dan cara load (WRITE_TRUNCATE) sengaja
+// disamakan dengan cron route agar keduanya tidak saling merusak tabel.
 const { BigQuery } = require('@google-cloud/bigquery');
 const { PrismaClient } = require('@prisma/client');
-const path = require('path');
+const { writeFile, unlink } = require('fs/promises');
+const { tmpdir } = require('os');
+const { join } = require('path');
 
-// Inisialisasi Prisma
+// Muat .env bila dijalankan langsung via `node scripts/etl-to-bigquery.js`
+try {
+  process.loadEnvFile();
+} catch {
+  // .env tidak ada — andalkan env dari shell
+}
+
 const prisma = new PrismaClient();
 
+const DATASET_ID = 'helpdesk_data';
+const TABLE_ID = 'tickets_analytics';
 
-const bigquery = new BigQuery({
-  keyFilename: path.join(__dirname, '../service-account-key.json'),
-  projectId: 'spg-ds-onda', 
-});
-const datasetId = 'helpdesk_data'; 
-
-async function createTableIfNotExists(tableName, schema) {
-  const dataset = bigquery.dataset(datasetId);
-  const table = dataset.table(tableName);
-  
-  const [exists] = await table.exists();
-  if (!exists) {
-    console.log(`Membuat tabel ${tableName} di BigQuery...`);
-    await dataset.createTable(tableName, { schema });
-  }
-}
+const TABLE_SCHEMA = [
+  { name: 'ticket_id', type: 'STRING' },
+  { name: 'title', type: 'STRING' },
+  { name: 'description', type: 'STRING' },
+  { name: 'notes', type: 'STRING' },
+  { name: 'kode_sales', type: 'STRING' },
+  { name: 'submitted_by', type: 'STRING' },
+  { name: 'type', type: 'STRING' },
+  { name: 'status', type: 'STRING' },
+  { name: 'created_at', type: 'TIMESTAMP' },
+  { name: 'updated_at', type: 'TIMESTAMP' },
+  { name: 'kategori', type: 'STRING' },
+  { name: 'nama_pengisi', type: 'STRING' },
+  { name: 'toko', type: 'STRING' },
+];
 
 async function syncTickets() {
   console.log('--- Mulai Sinkronisasi Tiket ---');
 
-  // 1. Ambil data dari PostgreSQL (Batching bisa ditambahkan jika data sangat besar)
-  const tickets = await prisma.ticket.findMany({
-    include: {
-        submittedBy: { select: { name: true } }
-    }
-  });
-  
-  if (tickets.length === 0) {
-      console.log("Tidak ada tiket untuk disinkronisasi.");
-      return;
+  if (!process.env.GCP_PROJECT_ID || !process.env.GCP_CLIENT_EMAIL || !process.env.GCP_PRIVATE_KEY) {
+    throw new Error('GCP_PROJECT_ID / GCP_CLIENT_EMAIL / GCP_PRIVATE_KEY belum diset di env (lihat .env.example).');
   }
 
-  // 2. Transformasi Data (Sesuaikan dengan tipe data BigQuery)
-  const rows = tickets.map(t => ({
-    ticket_id: Number(t.ticket_id), // BigInt ke Number/Integer
-    title: t.title,
-     description: t.detail?.description ?? null,
-    submitted_by: t.submittedBy?.name || 'Unknown', // Denormalisasi nama user
-    type: t.type,
-    status: t.status,
-    created_at: bigquery.datetime(t.createdAt.toISOString()), // Format Tanggal
-    updated_at: bigquery.datetime(t.updatedAt.toISOString()),
-    kategori: t.kategori,
-    sub_kategori: t.sub_kategori,
-    nama_pengisi: t.nama_pengisi,
-    jabatan: t.jabatan,
-    toko: t.toko
+  const bigquery = new BigQuery({
+    projectId: process.env.GCP_PROJECT_ID,
+    credentials: {
+      client_email: process.env.GCP_CLIENT_EMAIL,
+      private_key: process.env.GCP_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    },
+  });
+
+  const dataset = bigquery.dataset(DATASET_ID);
+  const [datasetExists] = await dataset.exists();
+  if (!datasetExists) {
+    console.log(`Dataset '${DATASET_ID}' tidak ada. Membuat dataset...`);
+    await dataset.create();
+  }
+
+  const table = dataset.table(TABLE_ID);
+  const [tableExists] = await table.exists();
+  if (!tableExists) {
+    console.log(`Membuat tabel ${TABLE_ID} di BigQuery...`);
+    await dataset.createTable(TABLE_ID, { schema: TABLE_SCHEMA });
+  }
+
+  const tickets = await prisma.ticket.findMany({
+    include: {
+      submittedBy: { select: { name: true, username: true } },
+      detail: true,
+      logs: { orderBy: { timestamp: 'desc' }, take: 1 },
+    },
+  });
+
+  console.log(`Total tiket dari DB: ${tickets.length}`);
+  if (!tickets.length) {
+    console.log('Tidak ada tiket untuk disinkronisasi.');
+    return;
+  }
+
+  const rows = tickets.map((t) => ({
+    ticket_id: String(t.ticket_id),
+    title: t.title ? String(t.title) : '(No Title)',
+    description: t.detail?.description ? String(t.detail.description) : '(No Description)',
+    notes: t.logs?.[0]?.notes ? String(t.logs[0].notes) : null,
+    submitted_by: t.submittedBy?.name ? String(t.submittedBy.name) : 'Unknown',
+    kode_sales: t.submittedBy?.username ? String(t.submittedBy.username) : 'Unknown',
+    type: t.type ? String(t.type) : 'Pending',
+    status: t.status ? String(t.status) : 'Open',
+    created_at: (t.createdAt ? new Date(t.createdAt) : new Date()).toISOString(),
+    updated_at: (t.updatedAt ? new Date(t.updatedAt) : new Date()).toISOString(),
+    kategori: t.kategori ? String(t.kategori) : '(No Category)',
+    nama_pengisi: t.nama_pengisi ? String(t.nama_pengisi) : 'Unknown',
+    toko: t.toko ? String(t.toko) : 'Unknown',
   }));
 
-  // 3. Load ke BigQuery
-  // Definisi Skema Tabel BigQuery
-  const schema = [
-    { name: 'ticket_id', type: 'INTEGER' },
-    { name: 'title', type: 'STRING' },
-    { name: 'submitted_by', type: 'STRING' },
-    { name: 'type', type: 'STRING' },
-    { name: 'status', type: 'STRING' },
-    { name: 'created_at', type: 'DATETIME' },
-    { name: 'updated_at', type: 'DATETIME' },
-    { name: 'kategori', type: 'STRING' },
-    { name: 'sub_kategori', type: 'STRING' },
-    { name: 'nama_pengisi', type: 'STRING' },
-    { name: 'jabatan', type: 'STRING' },
-    { name: 'toko', type: 'STRING' },
-    { name: 'description', type: 'STRING' },
-  ];
-
-  await createTableIfNotExists('tickets_analytics', schema);
-  
-  // Insert data (Streaming Insert)
-  // Catatan: Untuk data sangat besar, sebaiknya gunakan Job Load (batch load dari file JSONL)
-  // Tapi untuk ribuan baris, streaming insert masih oke.
-  // PENTING: Metode ini akan MENAMBAH data (append). 
-  // Untuk sinkronisasi penuh (overwrite), sebaiknya truncate tabel dulu atau gunakan metode WRITE_TRUNCATE via Job.
-  
-  // Solusi Sederhana: Hapus semua dulu (Truncate) lalu insert ulang (Full Load)
-  // Hati-hati, ini hanya cocok untuk dataset kecil-menengah.
-  const dataset = bigquery.dataset(datasetId);
-  const table = dataset.table('tickets_analytics');
-  
+  // Load job WRITE_TRUNCATE: isi tabel diganti penuh, bebas duplikat.
+  const tempFilePath = join(tmpdir(), `tickets-analytics-${Date.now()}.jsonl`);
   try {
-      // Hapus isi tabel lama (opsional, jika ingin data selalu fresh snapshot)
-      const query = `TRUNCATE TABLE \`${datasetId}.tickets_analytics\``;
-      await bigquery.query(query).catch(() => {}); // Abaikan error jika tabel belum ada
-      
-      // Insert baru
-      await table.insert(rows);
-      console.log(`Berhasil menyisipkan ${rows.length} baris ke tabel tickets_analytics.`);
-  } catch (e) {
-      if (e.name === 'PartialFailureError') {
-          e.errors.forEach(err => console.error(err));
-      } else {
-          console.error(e);
-      }
+    await writeFile(tempFilePath, rows.map((row) => JSON.stringify(row)).join('\n'));
+    await table.load(tempFilePath, {
+      sourceFormat: 'NEWLINE_DELIMITED_JSON',
+      writeDisposition: 'WRITE_TRUNCATE',
+      ignoreUnknownValues: true,
+    });
+    console.log(`Berhasil memuat ${rows.length} baris ke ${DATASET_ID}.${TABLE_ID}.`);
+  } finally {
+    await unlink(tempFilePath).catch(() => {});
   }
 }
 
 async function main() {
-    try {
-        await syncTickets();
-        // Anda bisa menambahkan fungsi sync untuk tabel lain (Logs, Users) di sini
-    } catch (err) {
-        console.error('ETL Error:', err);
-    } finally {
-        await prisma.$disconnect();
-    }
+  try {
+    await syncTickets();
+  } catch (err) {
+    console.error('ETL Error:', err);
+    process.exitCode = 1;
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 main();

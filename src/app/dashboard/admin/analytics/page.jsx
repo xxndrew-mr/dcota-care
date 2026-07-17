@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import {
   ArrowPathIcon,
   ArrowsPointingOutIcon,
   CircleStackIcon,
 } from '@heroicons/react/24/outline';
 
-const LOOKER_STUDIO_URL =
-  'https://lookerstudio.google.com/embed/reporting/0B5ff6cdq.../page/1M';
+const LOOKER_STUDIO_URL = process.env.NEXT_PUBLIC_LOOKER_STUDIO_URL ?? '';
 
 const REFRESH_INTERVAL_MS = 60_000;
 
@@ -41,9 +41,9 @@ function InfoBlock({ code, label, title, subtitle }) {
 }
 
 export default function AnalyticsPage() {
+  const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(true);
   const [now, setNow] = useState(null);
-  const [, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const update = () => setNow(new Date());
@@ -73,20 +73,48 @@ export default function AnalyticsPage() {
 
     if (!document.fullscreenElement) {
       frame.requestFullscreen?.();
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen?.();
-      setIsFullscreen(false);
     }
   };
+
+  if (!session) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#f26a21] border-t-transparent" />
+          <p className="dcota-mono text-[10.5px] font-bold uppercase tracking-[0.22em] text-slate-500">
+            Loading Analytics
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!['Administrator', 'Viewer'].includes(session.user.role)) {
+    return (
+      <div className="dcota-sans mx-auto mt-16 max-w-xl px-6">
+        <div className="border border-t-[3px] border-[#f26a21]/20 border-t-[#f26a21] bg-[#f26a21]/[0.04] p-8">
+          <p className="dcota-mono mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-[#f26a21]">
+            403 · Access Denied
+          </p>
+          <h3 className="mb-2 text-2xl font-extrabold tracking-tight text-slate-900">
+            Akses Ditolak
+          </h3>
+          <p className="text-[13.5px] leading-relaxed text-slate-600">
+            Hanya pengguna dengan role{' '}
+            <span className="dcota-mono font-bold text-slate-900">Administrator</span> atau{' '}
+            <span className="dcota-mono font-bold text-slate-900">Viewer</span> yang dapat
+            mengakses dashboard analitik.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -208,16 +236,31 @@ export default function AnalyticsPage() {
                 </div>
               )}
 
-              <iframe
-                src={LOOKER_STUDIO_URL}
-                frameBorder="0"
-                style={{ border: 0, width: '100%', height: '100%' }}
-                allowFullScreen
-                onLoad={() => setIsLoading(false)}
-                className="relative z-10"
-                title="Laporan Analisis Dcota Care"
-                sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-              />
+              {LOOKER_STUDIO_URL ? (
+                <iframe
+                  src={LOOKER_STUDIO_URL}
+                  frameBorder="0"
+                  style={{ border: 0, width: '100%', height: '100%' }}
+                  allowFullScreen
+                  onLoad={() => setIsLoading(false)}
+                  className="relative z-10"
+                  title="Laporan Analisis Dcota Care"
+                  sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+                />
+              ) : (
+                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-white px-6 text-center">
+                  <p className="dcota-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#f26a21]">
+                    Konfigurasi Diperlukan
+                  </p>
+                  <p className="max-w-md text-[13.5px] leading-relaxed text-slate-600">
+                    URL laporan belum diatur. Set environment variable{' '}
+                    <span className="dcota-mono font-bold text-slate-900">
+                      NEXT_PUBLIC_LOOKER_STUDIO_URL
+                    </span>{' '}
+                    dengan URL embed Looker Studio, lalu deploy ulang.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col justify-between gap-2 border border-t-0 border-slate-200 bg-slate-50/50 px-5 py-3 sm:flex-row sm:items-center">

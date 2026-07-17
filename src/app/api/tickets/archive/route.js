@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
+import { serialize } from '@/lib/serialize';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -18,7 +19,7 @@ export async function GET() {
         status: 'Archived',
         assignment_type: 'Feedback_Review',
 
-        // 🔐 Jika bukan viewer → hanya arsip milik sendiri
+        // Jika bukan Viewer, hanya arsip milik sendiri
         ...(isViewer
           ? {} 
           : { user_id: session.user.id }
@@ -49,7 +50,7 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(assignments);
+    return NextResponse.json(serialize(assignments));
   } catch (error) {
     console.error('Error fetching archive:', error);
     return NextResponse.json({ message: 'Error server' }, { status: 500 });

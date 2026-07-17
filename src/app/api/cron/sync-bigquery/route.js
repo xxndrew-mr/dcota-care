@@ -1,5 +1,8 @@
 import { BigQuery } from '@google-cloud/bigquery';
 import prisma from '@/lib/prisma';
+import { writeFile, unlink } from 'fs/promises';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -100,10 +103,10 @@ export async function GET(request) {
       return Response.json({ success: true, message: "Tidak ada data", total: 0 });
     }
 
-    const rows = tickets.map((t, idx) => {
+    const rows = tickets.map((t) => {
       const createdAt = t.createdAt ? new Date(t.createdAt) : new Date();
       const updatedAt = t.updatedAt ? new Date(t.updatedAt) : new Date();
-      const ticket_id = t.ticket_id ? String(t.ticket_id) : `ticket-${Math.random()}-${idx}`;
+      const ticket_id = String(t.ticket_id);
 
       return {
         ticket_id,
@@ -122,15 +125,26 @@ export async function GET(request) {
       };
     });
 
-    console.log("Rows ready for BigQuery Data preview:", rows.slice(0, 3));
+    // Load job dengan WRITE_TRUNCATE: isi tabel DIGANTI penuh setiap sync,
+    // bukan streaming insert append-only yang menumpuk duplikat tiap menit.
+    const tempFilePath = join(tmpdir(), `tickets-analytics-${Date.now()}.jsonl`);
 
     try {
-      await table.insert(rows, { ignoreUnknownValues: true, skipInvalidRows: true });
-      console.log(`Sinkronisasi telah selesai di lakukan , total rows attempted: ${rows.length}`);
+      await writeFile(tempFilePath, rows.map((row) => JSON.stringify(row)).join('\n'));
+
+      await table.load(tempFilePath, {
+        sourceFormat: 'NEWLINE_DELIMITED_JSON',
+        writeDisposition: 'WRITE_TRUNCATE',
+        ignoreUnknownValues: true,
+      });
+
+      console.log(`Sinkronisasi selesai, total rows: ${rows.length}`);
       return Response.json({ success: true, total: rows.length });
-    } catch (insertErr) {
-      console.error("❌ Error saat insert ke BigQuery:", insertErr);
-      return Response.json({ success: false, error: String(insertErr) }, { status: 500 });
+    } catch (loadErr) {
+      console.error("Error saat load ke BigQuery:", loadErr);
+      return Response.json({ success: false, error: String(loadErr) }, { status: 500 });
+    } finally {
+      await unlink(tempFilePath).catch(() => {});
     }
 
   } catch (err) {

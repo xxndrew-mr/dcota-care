@@ -5,10 +5,9 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Mulai proses seeding...');
 
-  // 1. Buat Roles
   const roles = [
-    'Administrator', 'Salesman', 'Agen', 'PIC OMI', 
-    'Sales Manager', 'Acting Manager', 'Acting PIC', 'User Feedback'
+    'Administrator', 'Salesman', 'Agen', 'PIC OMI', 'PIC OMI (SS)',
+    'Sales Manager', 'Acting Manager', 'Acting PIC', 'User Feedback', 'Viewer'
   ];
   for (const r of roles) {
     await prisma.role.upsert({
@@ -18,7 +17,6 @@ async function main() {
     });
   }
 
-  // 2. Buat Divisions (GABUNGAN: Regional + Fungsional)
   const divisions = [
     // Divisi Regional (Untuk Salesman/Agen/SM/PIC OMI)
     'Divisi AB', 'Divisi AT', 'Divisi DC', 'Divisi PDAM',
@@ -42,8 +40,12 @@ async function main() {
     });
   }
 
-  // 3. Buat User Admin
-  const adminPassword = await bcrypt.hash('password', 10);
+  // Password default untuk seluruh akun hasil seed — override via env untuk
+  // environment selain development/demo.
+  const adminPassword = await bcrypt.hash(
+    process.env.SEED_DEFAULT_PASSWORD || 'password',
+    10
+  );
   const roleAdmin = await prisma.role.findUnique({ where: { role_name: 'Administrator' } });
   
   await prisma.user.upsert({
@@ -58,8 +60,7 @@ async function main() {
     },
   });
 
-  // 4. BUAT USER PEJABAT (Hardcode untuk keperluan Routing)
-  // Kita butuh ID Role dulu
+  // BUAT USER PEJABAT (Hardcode untuk keperluan Routing)
   const roleAM = await prisma.role.findUnique({ where: { role_name: 'Acting Manager' } });
   const roleAP = await prisma.role.findUnique({ where: { role_name: 'Acting PIC' } });
 

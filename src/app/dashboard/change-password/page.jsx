@@ -103,7 +103,6 @@ export default function ChangePasswordPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
-      {/* Breadcrumb / eyebrow */}
       <div className="mb-6 flex items-center gap-3">
         <span className="bg-red-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-white">
           Akun
@@ -113,7 +112,6 @@ export default function ChangePasswordPage() {
         </span>
       </div>
 
-      {/* Headline */}
       <div className="mb-10 border-b-2 border-slate-900 pb-8">
         <h1 className="text-4xl font-black uppercase leading-none tracking-tight text-slate-900 sm:text-5xl">
           Ganti <span className="text-red-600">Password.</span>
@@ -124,7 +122,6 @@ export default function ChangePasswordPage() {
         </p>
       </div>
 
-      {/* Status messages */}
       {error && (
         <div className="mb-6 flex items-start gap-3 border-l-4 border-red-600 bg-red-50 px-4 py-3">
           <span className="mt-px text-[11px] font-bold uppercase tracking-widest text-red-600">
@@ -143,9 +140,7 @@ export default function ChangePasswordPage() {
         </div>
       )}
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="divide-y divide-slate-200 border border-slate-200">
-        {/* Field 01 */}
         <SwissField
           index="01"
           label="Password Saat Ini"
@@ -158,7 +153,6 @@ export default function ChangePasswordPage() {
           required
         />
 
-        {/* Field 02 */}
         <SwissField
           index="02"
           label="Password Baru"
@@ -173,7 +167,6 @@ export default function ChangePasswordPage() {
           required
         />
 
-        {/* Field 03 */}
         <SwissField
           index="03"
           label="Konfirmasi Password Baru"
@@ -186,7 +179,6 @@ export default function ChangePasswordPage() {
           required
         />
 
-        {/* Actions */}
         <div className="bg-slate-50 p-6">
           <button
             type="submit"
@@ -213,7 +205,6 @@ export default function ChangePasswordPage() {
         </div>
       </form>
 
-      {/* Footer note */}
       <div className="mt-8 border-l-4 border-amber-500 bg-amber-50 px-4 py-4">
         <p className="text-xs leading-relaxed text-amber-900">
           <span className="font-bold uppercase tracking-wide">Catatan — </span>

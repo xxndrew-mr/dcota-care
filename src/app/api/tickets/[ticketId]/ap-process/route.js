@@ -1,5 +1,3 @@
-// Lokasi: src/app/api/tickets/[ticketId]/ap-process/route.js
-
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
@@ -49,7 +47,7 @@ export async function POST(request, context) {
   }
 
   try {
-    let updatedTicket = null; // <- perbaikan 1
+    let updatedTicket = null;
     let submitter = null;
 
     const result = await prisma.$transaction(async (tx) => {
@@ -102,11 +100,11 @@ export async function POST(request, context) {
       }
 
       submitter = await tx.user.findUnique({
-        where: { user_id: updatedTicket.submitted_by_user_id }, // <- perbaikan 2
+        where: { user_id: updatedTicket.submitted_by_user_id },
         select: { email: true, name: true },
       });
 
-      return { updatedTicket, submitter }; // <- perbaikan 3
+      return { updatedTicket, submitter };
     });
 
     if (action === 'complete' && result.submitter?.email) {

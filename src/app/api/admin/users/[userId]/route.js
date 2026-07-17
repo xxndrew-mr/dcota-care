@@ -8,7 +8,6 @@ import bcrypt from 'bcryptjs';
 // UPDATE USER (ADMIN)
 // ================================
 export async function PUT(request, { params }) {
-  // ✅ FIX: unwrap params SEKALI
   const { userId } = await params;
   const id = parseInt(userId, 10);
 
@@ -31,7 +30,7 @@ export async function PUT(request, { params }) {
       name,
       username,
       email,
-      phone, // ✅ TAMBAHAN
+      phone,
       password,
       role_id,
       division_id,
@@ -80,7 +79,7 @@ export async function PUT(request, { params }) {
       name,
       username,
       email: email || null,
-      phone: phone || null, // ✅ SIMPAN NO TELP
+      phone: phone || null,
       role_id: parseInt(role_id, 10),
       division_id:
         role.role_name === 'PIC OMI (SS)'
@@ -99,6 +98,7 @@ export async function PUT(request, { params }) {
     const updatedUser = await prisma.user.update({
       where: { user_id: id },
       data: dataToUpdate,
+      omit: { password: true },
       include: {
         role: true,
         division: true,
@@ -109,9 +109,55 @@ export async function PUT(request, { params }) {
     return NextResponse.json(updatedUser);
 
   } catch (error) {
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { message: 'Username atau email sudah digunakan' },
+        { status: 400 }
+      );
+    }
+
     console.error('Gagal update user:', error);
     return NextResponse.json(
-      { message: 'Gagal update user', error: error.message },
+      { message: 'Gagal update user' },
+      { status: 500 }
+    );
+  }
+}
+
+// ================================
+// DELETE - Soft delete (nonaktifkan user)
+// ================================
+export async function DELETE(request, { params }) {
+  const { userId } = await params;
+  const id = parseInt(userId, 10);
+
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== 'Administrator') {
+    return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 403 });
+  }
+
+  if (isNaN(id)) {
+    return NextResponse.json({ message: 'User ID tidak valid' }, { status: 400 });
+  }
+
+  if (id === Number(session.user.id)) {
+    return NextResponse.json(
+      { message: 'Anda tidak dapat menonaktifkan akun sendiri.' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await prisma.user.update({
+      where: { user_id: id },
+      data: { status: 'Inactive' },
+    });
+
+    return NextResponse.json({ message: 'User berhasil dinonaktifkan.' });
+  } catch (error) {
+    console.error('Gagal menonaktifkan user:', error);
+    return NextResponse.json(
+      { message: 'Gagal menonaktifkan user', error: error.message },
       { status: 500 }
     );
   }

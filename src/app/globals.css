@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -159,4 +160,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Font identitas Dcota — dipakai di seluruh halaman */
+.dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+.dcota-mono { font-family: 'JetBrains Mono', monospace; }
 

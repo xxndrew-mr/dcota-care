@@ -1,25 +1,18 @@
-// Lokasi: src/app/api/tickets/my-history/route.js
-
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
-
-const serialize = (data) =>
-  JSON.parse(
-    JSON.stringify(data, (_, value) =>
-      typeof value === 'bigint' ? value.toString() : value
-    )
-  );
-
+import { serialize } from '@/lib/serialize';
 
 // FUNGSI: Mengambil riwayat tiket yang di-submit oleh user yang login
 export async function GET(request) {
-  // 1. Ambil session
   const session = await getServerSession(authOptions);
 
-  // 2. Cek otorisasi (Salesman ATAU Agen)
-  if (!session || !['Salesman', 'Agen'].includes(session.user.role)) {
+  if (!session) {
+    return NextResponse.json({ message: 'Anda harus login' }, { status: 401 });
+  }
+
+  if (!['Salesman', 'Agen'].includes(session.user.role)) {
     return NextResponse.json(
       { message: 'Anda tidak diizinkan.' },
       { status: 403 }
@@ -27,26 +20,21 @@ export async function GET(request) {
   }
 
   try {
-    // 3. Ambil data tiket dari database
     const tickets = await prisma.ticket.findMany({
       where: {
-        // HANYA ambil tiket yang di-submit oleh user ini
         submitted_by_user_id: session.user.id,
       },
       include: {
-        // 🔴 TADI MASALAH: hanya select description
-        // ✅ SOLUSI: tambahkan attachments_json juga
         detail: {
           select: {
             description: true,
-            attachments_json: true, // <-- penting supaya muncul di MyTicketsPage
+            attachments_json: true,
           },
         },
 
-        // Ambil SEMUA log riwayat, urutkan dari yang terlama
         logs: {
           include: {
-            actor: { select: { name: true } }, // Siapa yang melakukan aksi
+            actor: { select: { name: true } },
           },
           orderBy: {
             timestamp: 'asc',
@@ -70,19 +58,16 @@ export async function GET(request) {
           },
         },
       },
-      // Urutkan tiket, tampilkan yang terbaru di atas
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    // 4. Kirim response sukses
     return NextResponse.json(serialize(tickets));
-
   } catch (error) {
     console.error('Gagal mengambil riwayat tiket:', error);
     return NextResponse.json(
-      { message: 'Gagal mengambil riwayat tiket.', error: error.message },
+      { message: 'Gagal mengambil riwayat tiket.' },
       { status: 500 }
     );
   }

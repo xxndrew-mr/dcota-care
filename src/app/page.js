@@ -13,7 +13,6 @@ export default function HomePage() {
   useEffect(() => {
     if (status === 'loading') return;
 
-    // Logika pengalihan tetap sama
     if (session) {
       router.replace('/dashboard');
     } else {
@@ -24,10 +23,6 @@ export default function HomePage() {
   return (
     <>
       <style jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-
         @keyframes loadingBar {
           0%   { transform: translateX(-100%); }
           100% { transform: translateX(250%); }

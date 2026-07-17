@@ -4,13 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
 import { sendTicketAssignedEmail } from '@/lib/email';
 import { getRoutingTarget } from '@/lib/smartRouting';
-
-const serialize = (data) =>
-  JSON.parse(
-    JSON.stringify(data, (_, value) =>
-      typeof value === 'bigint' ? value.toString() : value
-    )
-  );
+import { serialize } from '@/lib/serialize';
 
 const REQUIRED_ATTACHMENT_RULES = ['PRODUK'];
 
@@ -42,7 +36,9 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Agen wajib mengisi Jabatan.' }, { status: 400 });
     }
 
-    const isAttachmentRequired = REQUIRED_ATTACHMENT_RULES.includes(kategori);
+    const isAttachmentRequired = REQUIRED_ATTACHMENT_RULES.includes(
+      kategori.toUpperCase()
+    );
 
     if (isAttachmentRequired && (!attachments || attachments.length === 0)) {
       return NextResponse.json(
@@ -94,7 +90,7 @@ export async function POST(request) {
     if (!assignedPicOmiId) {
       return NextResponse.json(
         { message: 'Akun belum dihubungkan ke PIC OMI. Hubungi Admin.' },
-        { status: 500 }
+        { status: 422 }
       );
     }
 
@@ -205,13 +201,6 @@ export async function POST(request) {
   } catch (error) {
     console.error('Gagal submit tiket:', error);
 
-    return NextResponse.json(
-      {
-        message: 'Error server.',
-        error: error.message,
-        code: error.code || null,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error server.' }, { status: 500 });
   }
 }

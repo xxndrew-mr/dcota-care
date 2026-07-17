@@ -1,5 +1,3 @@
-// src/lib/auth.js
-
 import CredentialsProvider from 'next-auth/providers/credentials'
 import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
@@ -25,8 +23,10 @@ export const authOptions = {
           },
         })
 
+        // Pesan sengaja disamakan untuk username salah maupun password salah —
+        // pesan yang berbeda memungkinkan penebakan (enumerasi) username.
         if (!user) {
-          throw new Error('Username tidak ditemukan.')
+          throw new Error('Username atau password salah.')
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -35,7 +35,7 @@ export const authOptions = {
         )
 
         if (!isPasswordCorrect) {
-          throw new Error('Password salah.')
+          throw new Error('Username atau password salah.')
         }
 
         if (user.status !== 'Active') {

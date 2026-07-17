@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Fragment, useMemo } from 'react';
+import { useState, useEffect, Fragment, useMemo, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { Dialog, Transition } from '@headlessui/react';
 import {
@@ -259,6 +259,7 @@ function UserForm({
               value={formData.password}
               onChange={handleInputChange}
               required={!initialData}
+              minLength={8}
               placeholder={initialData ? '••••••••' : 'Min. 8 karakter'}
               className={INPUT_CLASSES}
             />
@@ -495,6 +496,7 @@ export default function AdminUsersPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [modalState, setModalState] = useState({ isOpen: false, type: 'create', user: null });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -502,9 +504,12 @@ export default function AdminUsersPage() {
   const [filterDiv, setFilterDiv] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
+  const notificationTimerRef = useRef(null);
+
   const triggerNotification = (type, message) => {
     setNotification({ type, message });
-    setTimeout(() => setNotification(null), 3500);
+    clearTimeout(notificationTimerRef.current);
+    notificationTimerRef.current = setTimeout(() => setNotification(null), 3500);
   };
 
   const loadInitialData = async () => {
@@ -565,6 +570,8 @@ export default function AdminUsersPage() {
 
   const handleImportCsv = async (event) => {
     const file = event.target.files[0];
+    // Reset supaya memilih file yang sama dua kali tetap memicu onChange
+    event.target.value = '';
     if (!file) return;
 
     const formData = new FormData();
@@ -582,6 +589,7 @@ export default function AdminUsersPage() {
   };
 
   const handleCreateUser = async (payload) => {
+    setIsSubmitting(true);
     try {
       const res = await fetch('/api/admin/users', {
         method: 'POST',
@@ -595,22 +603,28 @@ export default function AdminUsersPage() {
       loadInitialData();
     } catch (err) {
       triggerNotification('error', err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleUpdateUser = async (payload) => {
+    setIsSubmitting(true);
     try {
       const res = await fetch(`/api/admin/users/${modalState.user.user_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('Gagal update');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Gagal update');
       triggerNotification('success', 'User berhasil diperbarui!');
       setModalState({ isOpen: false, type: 'create', user: null });
       loadInitialData();
     } catch (err) {
       triggerNotification('error', err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -620,12 +634,19 @@ export default function AdminUsersPage() {
 
     try {
       const method = currentStatus === 'Active' ? 'DELETE' : 'PUT';
+      const target = users.find((user) => user.user_id === userId);
       const body =
         currentStatus === 'Active'
           ? undefined
           : JSON.stringify({
+            name: target.name,
+            username: target.username,
+            email: target.email,
+            phone: target.phone,
+            role_id: target.role_id,
+            division_id: target.division_id,
+            pic_omi_id: target.pic_omi_id,
             status: 'Active',
-            ...users.find((user) => user.user_id === userId),
           });
 
       const res = await fetch(`/api/admin/users/${userId}`, {
@@ -633,7 +654,8 @@ export default function AdminUsersPage() {
         headers: method === 'PUT' ? { 'Content-Type': 'application/json' } : undefined,
         body,
       });
-      if (!res.ok) throw new Error('Gagal mengubah status');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Gagal mengubah status');
       triggerNotification('success', 'Status user berhasil diperbarui.');
       loadInitialData();
     } catch (err) {
@@ -660,12 +682,6 @@ export default function AdminUsersPage() {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-      `}</style>
-
       <div className="dcota-sans animate-in fade-in bg-white duration-500">
         <Transition
           show={Boolean(notification)}
@@ -1069,7 +1085,7 @@ export default function AdminUsersPage() {
                         roles={roles}
                         divisions={divisions}
                         picOmis={picOmis}
-                        isLoading={isLoading}
+                        isLoading={isSubmitting}
                         onClose={closeModal}
                         onSubmit={
                           modalState.type === 'create' ? handleCreateUser : handleUpdateUser

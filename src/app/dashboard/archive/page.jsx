@@ -5,35 +5,9 @@ import {
   ArchiveBoxIcon,
   CalendarDaysIcon,
   UserIcon,
-  PaperClipIcon, // <-- TAMBAHAN
+  PaperClipIcon,
 } from '@heroicons/react/24/outline';
-
-// Helpers ----------------------------------------------------
-const formatDate = (dateString) => {
-  if (!dateString) return '-';
-  return new Date(dateString).toLocaleString('id-ID', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
-
-const getMonthKey = (dateString) => {
-  if (!dateString) return null;
-  const d = new Date(dateString);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-};
-
-const getMonthLabel = (dateString) => {
-  if (!dateString) return '-';
-  return new Date(dateString).toLocaleDateString('id-ID', {
-    month: 'long',
-    year: 'numeric',
-  });
-};
-// ------------------------------------------------------------
+import { formatDate, getMonthKey, getMonthLabel } from '@/lib/format';
 
 export default function ArchivePage() {
   const [assignments, setAssignments] = useState([]);
@@ -42,12 +16,13 @@ export default function ArchivePage() {
 
   useEffect(() => {
     fetch('/api/tickets/archive')
-      .then((res) => res.json())
-      .then((data) => {
-        setAssignments(data);
-        setIsLoading(false);
+      .then((res) => {
+        if (!res.ok) throw new Error('Gagal mengambil data arsip');
+        return res.json();
       })
-      .catch(() => setIsLoading(false));
+      .then((data) => setAssignments(Array.isArray(data) ? data : []))
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const monthOptions = Array.from(
@@ -81,7 +56,6 @@ export default function ArchivePage() {
 
   return (
     <div className="px-4 py-6">
-      {/* HEADER */}
       <div className="relative mb-8 rounded-3xl bg-gradient-to-br from-[#5c1602] via-[#dc2626] to-[#ed781e] px-6 py-6 shadow-lg overflow-hidden">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -96,7 +70,6 @@ export default function ArchivePage() {
             </p>
           </div>
 
-          {/* FILTER BULAN */}
           <div className="mt-3 sm:mt-0 flex items-center gap-2 bg-white/10 px-3 py-2 rounded-xl backdrop-blur text-xs text-white">
             <CalendarDaysIcon className="h-4 w-4" />
             <select
@@ -117,7 +90,6 @@ export default function ArchivePage() {
         <div className="pointer-events-none absolute -right-10 -bottom-10 h-28 w-28 bg-white/20 rounded-full blur-2xl" />
       </div>
 
-      {/* BODY */}
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
         {filteredAssignments.length === 0 ? (
           <div className="py-10 text-center text-slate-500 text-sm">
@@ -130,7 +102,6 @@ export default function ArchivePage() {
                 key={asg.assignment_id}
                 className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm hover:border-indigo-300 hover:shadow-md transition"
               >
-                {/* Header kartu */}
                 <div className="flex justify-between items-start">
                   <h2 className="line-clamp-2 font-semibold text-slate-800">
                     {asg.ticket.title}
@@ -141,7 +112,6 @@ export default function ArchivePage() {
                   </span>
                 </div>
 
-                {/* Info pengirim & tanggal */}
                 <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500">
                   <UserIcon className="h-3 w-3 text-slate-400" />
                   <span>{asg.ticket.submittedBy?.name}</span>
@@ -149,12 +119,10 @@ export default function ArchivePage() {
                   <span>{formatDate(asg.ticket.createdAt)}</span>
                 </div>
 
-                {/* Deskripsi */}
                 <p className="mt-3 text-xs leading-relaxed bg-slate-50 rounded-xl px-3 py-2 line-clamp-3 text-slate-700">
                   {asg.ticket.detail?.description || '(Tidak ada deskripsi)'}
                 </p>
 
-                {/* Lampiran */}
                 {asg.ticket.detail?.attachments_json &&
                   Array.isArray(asg.ticket.detail.attachments_json) &&
                   asg.ticket.detail.attachments_json.length > 0 && (

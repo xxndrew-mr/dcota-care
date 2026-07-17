@@ -1,4 +1,13 @@
-export function emailTemplate({ title, subtitle, message, ticketId, kategori, subKategori }) {
+// URL aplikasi diambil dari env agar email selalu menunjuk deployment aktif.
+const APP_URL = (
+  process.env.NEXT_PUBLIC_APP_URL ||
+  process.env.NEXTAUTH_URL ||
+  'http://localhost:3000'
+).replace(/\/+$/, '');
+const LOGIN_URL = `${APP_URL}/login`;
+const LOGO_URL = `${APP_URL}/dcota-logo.png`;
+
+export function emailTemplate({ title, subtitle, message, ticketId }) {
   return `
   <!DOCTYPE html>
   <html lang="id">
@@ -23,7 +32,7 @@ export function emailTemplate({ title, subtitle, message, ticketId, kategori, su
                       <tr>
                           <td style="padding:30px 25px; text-align:center; border-bottom:1px solid #efefef;">
 
-                              <img src="https://helpdesk-sc-onda.vercel.app/images/logo_email.webp"
+                              <img src="${LOGO_URL}"
                                   width="110" alt="OMI Logo"
                                   style="display:block; margin:0 auto 20px;"/>
 
@@ -52,22 +61,6 @@ export function emailTemplate({ title, subtitle, message, ticketId, kategori, su
                               ">
 
                                   ${
-                                    kategori
-                                      ? `<p style="margin:0 0 8px;">
-                                            <strong style="color:#222;">Kategori:</strong> ${kategori}
-                                         </p>`
-                                      : ""
-                                  }
-
-                                  ${
-                                    subKategori
-                                      ? `<p style="margin:0 0 8px;">
-                                            <strong style="color:#222;">Sub Kategori:</strong> ${subKategori}
-                                         </p>`
-                                      : ""
-                                  }
-
-                                  ${
                                     ticketId
                                       ? `<p style="margin:0;">
                                             <strong style="color:#222;">ID Tiket:</strong> ${ticketId}
@@ -82,7 +75,7 @@ export function emailTemplate({ title, subtitle, message, ticketId, kategori, su
                       <!-- CTA -->
                       <tr>
                           <td align="center" style="padding:0 25px 35px;">
-                              <a href="https://helpdesk-sc-onda.vercel.app/login" target="_blank"
+                              <a href="${LOGIN_URL}" target="_blank"
                                   style="background-color:#1f2937; color:#ffffff; padding:12px 26px;
                                          text-decoration:none; border-radius:6px; font-weight:600;
                                          display:inline-block; font-size:14px;">

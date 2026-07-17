@@ -140,7 +140,7 @@ function SectionCard({ code, title, subtitle, status, optional, badge, badgeAcce
   );
 }
 
-function SectionStatusDot({ status, optional }) {
+function SectionStatusDot({ status }) {
   if (status === 'complete') {
     return (
       <span className="flex h-5 w-5 items-center justify-center bg-emerald-500 text-white">
@@ -177,6 +177,8 @@ export default function SubmitTicketPage() {
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
+    // Reset supaya memilih file yang sama setelah ditolak tetap memicu onChange
+    event.target.value = '';
     if (!selectedFile) return;
 
     const isAllowed = ALLOWED_FILE_TYPES.some((type) =>
@@ -289,7 +291,8 @@ export default function SubmitTicketPage() {
     if (!session?.user) return {};
     const isSalesman = effectiveUserRole === 'Salesman';
 
-    const phoneOk = phone.trim().length >= 8;
+    // Selaras dengan validasi API submit: minimal 9 digit angka
+    const phoneOk = phone.replace(/[^0-9]/g, '').length >= 9;
     const jabatanOk = isSalesman ? true : jabatan.trim().length > 0;
     let s01;
     if (!phoneOk && !jabatanOk && !toko) s01 = 'empty';
@@ -326,10 +329,6 @@ export default function SubmitTicketPage() {
   if (!session) {
     return (
       <>
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
-          .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-        `}</style>
         <div className="flex min-h-[60vh] items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#f26a21] border-t-transparent" />
@@ -345,11 +344,6 @@ export default function SubmitTicketPage() {
   if (!['Salesman', 'Agen'].includes(session.user.role)) {
     return (
       <>
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-          .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-          .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-        `}</style>
         <div className="dcota-sans mx-auto mt-16 max-w-xl px-6">
           <div className="border border-t-[3px] border-[#f26a21]/20 border-t-[#f26a21] bg-[#f26a21]/[0.04] p-8">
             <p className="dcota-mono mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-[#f26a21]">
@@ -380,10 +374,6 @@ export default function SubmitTicketPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -802,7 +792,7 @@ export default function SubmitTicketPage() {
                           >
                             {item.label}
                           </span>
-                          <SectionStatusDot status={item.status} optional={item.optional} />
+                          <SectionStatusDot status={item.status} />
                         </li>
                       ))}
                     </ul>

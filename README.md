@@ -16,6 +16,11 @@ An end-to-end ticketing platform — from submission and triage through a multi-
   <img alt="NextAuth" src="https://img.shields.io/badge/Auth-NextAuth.js-000?logo=auth0&logoColor=white" />
   <img alt="Vercel" src="https://img.shields.io/badge/Deploy-Vercel-000000?logo=vercel&logoColor=white" />
   <img alt="Status" src="https://img.shields.io/badge/status-in%20production-success" />
+  <a href="https://github.com/xxndrew-mr/dcota-care/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/xxndrew-mr/dcota-care/actions/workflows/ci.yml/badge.svg" /></a>
+</p>
+
+<p>
+  <a href="docs/CASE-STUDY.md"><b>📚 Read the full engineering case study →</b></a>
 </p>
 
 </div>
@@ -29,6 +34,36 @@ An end-to-end ticketing platform — from submission and triage through a multi-
 It is a full-stack application built on the **Next.js App Router** with a **PostgreSQL** database (via Prisma), role-based access control (**RBAC**), attachment storage on **Cloudflare R2**, and analytics powered by **Google BigQuery**. The system is currently deployed on Vercel and serves internal sales & operations teams (~500 users).
 
 > The user-facing interface is written in **Indonesian**, serving an Indonesian sales organization.
+
+## 📸 Screenshots
+
+<!--
+Ganti placeholder ini dengan screenshot dari environment DEMO (jangan data production!).
+Simpan gambar di docs/screenshots/ lalu aktifkan baris di bawah.
+
+| Dashboard | Submit Ticket | Triage Queue |
+| --- | --- | --- |
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Submit](docs/screenshots/submit.png) | ![Queue](docs/screenshots/queue.png) |
+-->
+
+*Screenshots coming soon — a public demo environment is being prepared.*
+
+## 🔗 Live Demo
+
+<!--
+Setelah demo environment terpasang, isi bagian ini:
+
+**Demo:** https://dcota-care-demo.vercel.app
+
+| Role | Username | Password |
+| --- | --- | --- |
+| Administrator | admin | ******** |
+| Salesman | demo_sales | ******** |
+| PIC OMI | demo_pic | ******** |
+| Sales Manager | demo_sm | ******** |
+-->
+
+*A sandboxed demo with per-role accounts is on the roadmap — the production instance serves internal users only.*
 
 ## ✨ Key Features
 
@@ -70,6 +105,37 @@ flowchart LR
 
 Each ticket moves through a chain of *assignments*, and every transition writes a log entry — so the full history of any request is always traceable.
 
+## 🗄️ Data Model
+
+```mermaid
+erDiagram
+    Role ||--o{ User : "has"
+    Division ||--o{ User : "has"
+    User |o--o{ User : "PIC OMI handler"
+    User ||--o{ Ticket : "submits"
+    User ||--o{ TicketAssignment : "is assigned"
+    User ||--o{ TicketLog : "acts on"
+    Ticket ||--o| TicketDetail : "has"
+    Ticket ||--o{ TicketAssignment : "flows through"
+    Ticket ||--o{ TicketLog : "is audited by"
+
+    Ticket {
+        BigInt ticket_id PK
+        String type "Pending | Request | Feedback"
+        String status "Open | Done | Rejected"
+        String kategori
+    }
+    TicketAssignment {
+        BigInt assignment_id PK
+        String assignment_type "Active | Feedback_Review"
+        String status "Pending | Done | Rejected | Bookmarked | Archived"
+    }
+    TicketLog {
+        BigInt log_id PK
+        String action_type "Submit | Triase | sm_* | am_* | ap_* | feedback_*"
+    }
+```
+
 ## 👥 User Roles
 
 | Role | Responsibility |
@@ -87,9 +153,10 @@ Each ticket moves through a chain of *assignments*, and every transition writes 
 - **Per-route authorization** — every API route enforces its own role check against the session, keeping authorization explicit and colocated with each endpoint.
 - **Assignment-driven lifecycle** — a user's work queue is simply their *pending* assignments; status transitions are append-only and fully logged.
 - **Category → division smart routing** — a single mapping layer decides which Acting Manager / Acting PIC division handles each ticket.
-- **Presigned uploads** — a lightweight Go serverless function issues time-limited PUT URLs to R2, so file bytes never pass through the app server.
+- **Presigned uploads** — a session-validated Go serverless function issues time-limited, size-signed PUT URLs to R2, so file bytes never pass through the app server.
 - **Non-blocking side effects** — emails and follow-up assignments are dispatched after the main transaction, never blocking the response path.
-- **Scheduled analytics sync** — a Vercel Cron job pushes ticket data to BigQuery for the reporting layer.
+- **Scheduled analytics sync** — a Vercel Cron job snapshots ticket data to BigQuery via `WRITE_TRUNCATE` load jobs, keeping the reporting layer duplicate-free.
+- **Race-safe workflow transitions** — triage uses conditional updates inside the transaction, so concurrent actions fail cleanly instead of corrupting ticket state.
 
 ## 🚀 Getting Started
 
@@ -124,9 +191,15 @@ npm run dev                 # http://localhost:3000
 
 ```bash
 npm run build               # production build
-npx eslint .                # lint
+npm run lint                # lint
+npm test                    # unit tests (Vitest)
 node scripts/etl-to-bigquery.js   # manual ETL to BigQuery
 ```
+
+## ✅ Quality
+
+- **Unit tests** (Vitest) cover the pure domain logic: category → division routing, BigInt serialization, and shared formatting utilities.
+- **CI** (GitHub Actions) runs lint, tests, the Next.js production build, and `go vet`/`go build` for the upload function on every push and pull request.
 
 ## 📁 Project Structure
 

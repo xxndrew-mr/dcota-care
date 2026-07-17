@@ -16,6 +16,7 @@ export async function GET() {
 
   try {
     const users = await prisma.user.findMany({
+      omit: { password: true },
       include: {
         role: true,
         division: true,
@@ -24,10 +25,8 @@ export async function GET() {
 
     return NextResponse.json(users);
   } catch (error) {
-    return NextResponse.json(
-      { message: 'Gagal', error: error.message },
-      { status: 500 }
-    );
+    console.error('Gagal mengambil users:', error);
+    return NextResponse.json({ message: 'Gagal' }, { status: 500 });
   }
 }
 
@@ -48,6 +47,7 @@ export async function POST(request) {
       name,
       username,
       email,
+      phone,
       password,
       role_id,
       division_id,
@@ -61,7 +61,6 @@ export async function POST(request) {
       );
     }
 
-    // Cek username unik
     const userExists = await prisma.user.findUnique({
       where: { username },
     });
@@ -80,11 +79,13 @@ export async function POST(request) {
         name,
         username,
         email: email || null,
+        phone: phone || null,
         password: hashedPassword,
         role_id: parseInt(role_id, 10),
         division_id: division_id ? parseInt(division_id, 10) : null,
         pic_omi_id: pic_omi_id ? parseInt(pic_omi_id, 10) : null,
       },
+      omit: { password: true },
       include: {
         role: true,
         division: true,
@@ -94,9 +95,16 @@ export async function POST(request) {
     return NextResponse.json(newUser, { status: 201 });
 
   } catch (error) {
-    console.error(error);
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { message: 'Username atau email sudah digunakan' },
+        { status: 400 }
+      );
+    }
+
+    console.error('Gagal membuat user:', error);
     return NextResponse.json(
-      { message: 'Gagal membuat user', error: error.message },
+      { message: 'Gagal membuat user' },
       { status: 500 }
     );
   }

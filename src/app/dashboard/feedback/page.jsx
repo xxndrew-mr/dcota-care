@@ -8,15 +8,12 @@ import {
   PaperClipIcon,
   InboxIcon,
   UserIcon,
-  TagIcon,
   BuildingStorefrontIcon,
   InformationCircleIcon,
   ArrowPathIcon,
-  CheckCircleIcon,
   ExclamationCircleIcon
 } from '@heroicons/react/24/outline';
 
-// 1. KOMPONEN HELPER ICON
 function MessageSquareIconHelper({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
@@ -25,7 +22,6 @@ function MessageSquareIconHelper({ className }) {
   );
 }
 
-// 2. KOMPONEN AKSI FEEDBACK
 function FeedbackActions({ assignment, onSuccess, onError }) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -83,7 +79,6 @@ function FeedbackActions({ assignment, onSuccess, onError }) {
   );
 }
 
-// 3. KOMPONEN HALAMAN UTAMA
 export default function FeedbackQueuePage() {
   const [assignments, setAssignments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -145,6 +140,19 @@ export default function FeedbackQueuePage() {
         </div>
         <div className="absolute -right-10 -bottom-10 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
       </div>
+
+      {error && (
+        <div className="flex items-center gap-3 rounded-2xl border border-red-100 bg-red-50 p-4 text-red-700">
+          <ExclamationCircleIcon className="h-5 w-5 flex-shrink-0" />
+          <p className="text-sm font-bold">{error}</p>
+          <button
+            onClick={loadQueue}
+            className="ml-auto text-xs font-bold underline hover:text-red-900"
+          >
+            Coba lagi
+          </button>
+        </div>
+      )}
 
       {actionError && (
         <div className="flex items-center gap-3 rounded-2xl border border-red-100 bg-red-50 p-4 text-red-700">

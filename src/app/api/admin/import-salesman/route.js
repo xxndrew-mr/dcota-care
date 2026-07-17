@@ -33,6 +33,7 @@ export async function POST(request) {
       columns: true,
       skip_empty_lines: true,
       trim: true,
+      bom: true,
     });
 
     if (!rows.length) {
@@ -42,7 +43,6 @@ export async function POST(request) {
       );
     }
 
-    // Ambil Role Salesman
     const salesmanRole = await prisma.role.findFirst({
       where: { role_name: 'Salesman' },
     });
@@ -54,7 +54,6 @@ export async function POST(request) {
       );
     }
 
-    // Ambil Division & PIC OMI
     const divisions = await prisma.division.findMany();
     const picOmis = await prisma.user.findMany({
       where: {
@@ -64,7 +63,13 @@ export async function POST(request) {
       },
     });
 
-    const defaultPassword = await bcrypt.hash('123456', 10);
+    // Password awal seluruh salesman hasil import — dikonfigurasi via env
+    // (fitur ganti password Salesman dinonaktifkan, jadi nilai ini permanen
+    // sampai kebijakan berubah).
+    const defaultPassword = await bcrypt.hash(
+      process.env.IMPORT_DEFAULT_PASSWORD || '123456',
+      10
+    );
 
     const usersToInsert = [];
 
@@ -104,24 +109,23 @@ export async function POST(request) {
       );
     }
 
-    await prisma.user.createMany({
+    const created = await prisma.user.createMany({
       data: usersToInsert,
       skipDuplicates: true,
     });
 
     return NextResponse.json({
       message: 'Import berhasil',
-      inserted: usersToInsert.length,
+      inserted: created.count,
+      duplicate: usersToInsert.length - created.count,
+      invalid: rows.length - usersToInsert.length,
     });
 
   } catch (error) {
     console.error('IMPORT ERROR:', error);
 
     return NextResponse.json(
-      {
-        message: 'Gagal import',
-        error: error.message,
-      },
+      { message: 'Gagal import' },
       { status: 500 }
     );
   }

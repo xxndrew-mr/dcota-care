@@ -257,6 +257,7 @@ export default function QueuePage() {
   const loadQueue = async () => {
     setError(null);
     setActionError(null);
+    setIsLoading(true);
     try {
       const res = await fetch('/api/queue/my-queue?type=Active');
       if (!res.ok) throw new Error('Gagal mengambil data antrian');
@@ -279,18 +280,14 @@ export default function QueuePage() {
   const requestCount = assignments.filter(
     (assignment) => assignment.ticket?.type === 'Request'
   ).length;
-  const feedbackCount = assignments.length - requestCount;
+  const feedbackCount = assignments.filter(
+    (assignment) => assignment.ticket?.type === 'Feedback'
+  ).length;
   const role = session?.user?.role || '';
   const isPicOmi = ['PIC OMI', 'PIC OMI (SS)'].includes(role);
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-        .dcota-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .dcota-mono { font-family: 'JetBrains Mono', monospace; }
-      `}</style>
-
       <div className="dcota-sans animate-in fade-in bg-white duration-500">
         <section className="border-b border-slate-200">
           <div className="mx-auto max-w-[1440px] px-6 pb-10 pt-12 lg:px-12">

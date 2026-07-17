@@ -14,7 +14,6 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
 
-    // ⬇️ TAMBAHKAN INI
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
