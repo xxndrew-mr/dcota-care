@@ -430,12 +430,12 @@ export default function DashboardPage() {
                     <p className="text-[15px] text-slate-900 font-semibold leading-snug mb-2">
                       {isSalesAgen && "Pastikan koneksi stabil."}
                       {isPIC && "Prioritaskan label urgent."}
-                      {isManagerPlus && "Tinjau tren mingguan."}
+                      {(isApprover || isUserFeedback || isViewer) && "Tinjau tren mingguan."}
                     </p>
                     <p className="text-[12.5px] text-slate-600 leading-relaxed">
                       {isSalesAgen && "Gunakan jaringan yang stabil saat mengirim laporan agar data tersinkronisasi sempurna ke server."}
                       {isPIC && "Tangani antrian dengan label urgent terlebih dahulu untuk menjaga kualitas layanan kepada pelanggan."}
-                      {isManagerPlus && "Lakukan review tren feedback setiap minggu sebagai bahan evaluasi performa divisi."}
+                      {(isApprover || isUserFeedback || isViewer) && "Lakukan review tren feedback setiap minggu sebagai bahan evaluasi performa divisi."}
                     </p>
                   </div>
                 )}
