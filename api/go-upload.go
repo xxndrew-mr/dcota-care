@@ -2,11 +2,15 @@ package handler
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -77,53 +81,56 @@ func requestBaseURL(r *http.Request) string {
 	return proto + "://" + host
 }
 
-// isAuthenticated memvalidasi cookie session NextAuth dengan meneruskannya
-// ke endpoint /api/auth/session pada deployment yang sama — validasi JWT
-// tetap sepenuhnya dilakukan oleh NextAuth, bukan diduplikasi di Go.
+func uploadSecret() string {
+	if s := os.Getenv("UPLOAD_SIGNING_SECRET"); s != "" {
+		return s
+	}
+	return os.Getenv("NEXTAUTH_SECRET")
+}
+
+// isAuthenticated memverifikasi token upload HMAC berumur pendek yang
+// diterbitkan oleh /api/upload-token untuk user yang sudah login. Verifikasi
+// dilakukan sepenuhnya lokal (tanpa panggilan jaringan), memakai secret yang
+// sama dengan sisi Next.js. Format token: "<exp-unix-seconds>.<hex-hmac>".
 func isAuthenticated(r *http.Request) bool {
-	cookie := r.Header.Get("Cookie")
-	if cookie == "" {
+	token := r.Header.Get("X-Upload-Token")
+	if token == "" {
 		return false
 	}
 
-	req, err := http.NewRequestWithContext(r.Context(), http.MethodGet, requestBaseURL(r)+"/api/auth/session", nil)
-	if err != nil {
-		return false
-	}
-	req.Header.Set("Cookie", cookie)
-
-	client := &http.Client{Timeout: 5 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Gagal validasi session:", err)
-		return false
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
+	secret := uploadSecret()
+	if secret == "" {
+		fmt.Println("UPLOAD_SIGNING_SECRET / NEXTAUTH_SECRET belum diset")
 		return false
 	}
 
-	// Saat tidak login, NextAuth membalas 200 dengan objek kosong {}.
-	var session struct {
-		User *struct {
-			Name string `json:"name"`
-		} `json:"user"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&session); err != nil {
+	parts := strings.SplitN(token, ".", 2)
+	if len(parts) != 2 {
 		return false
 	}
-	return session.User != nil
+	expStr, sig := parts[0], parts[1]
+
+	exp, err := strconv.ParseInt(expStr, 10, 64)
+	if err != nil || time.Now().Unix() > exp {
+		return false
+	}
+
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(expStr))
+	expected := hex.EncodeToString(mac.Sum(nil))
+
+	return hmac.Equal([]byte(sig), []byte(expected))
 }
 
 // allowedOrigin hanya mengizinkan origin deployment ini sendiri (plus
-// localhost untuk pengembangan) — bukan wildcard.
+// localhost saat pengembangan, bukan di production) — bukan wildcard.
 func allowedOrigin(r *http.Request) string {
 	origin := r.Header.Get("Origin")
 	if origin == "" {
 		return ""
 	}
-	if origin == requestBaseURL(r) || strings.HasPrefix(origin, "http://localhost:") {
+	isProd := os.Getenv("VERCEL_ENV") == "production"
+	if origin == requestBaseURL(r) || (!isProd && strings.HasPrefix(origin, "http://localhost:")) {
 		return origin
 	}
 	host := r.Header.Get("X-Forwarded-Host")
@@ -143,7 +150,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Vary", "Origin")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Upload-Token")
 
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)

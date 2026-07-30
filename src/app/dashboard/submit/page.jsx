@@ -196,9 +196,18 @@ export default function SubmitTicketPage() {
   };
 
   const uploadAttachment = async () => {
+    const tokenRes = await fetch('/api/upload-token');
+    if (!tokenRes.ok) {
+      throw new Error('Sesi Anda tidak valid. Silakan muat ulang halaman lalu login kembali.');
+    }
+    const { token } = await tokenRes.json();
+
     const presignRes = await fetch('/api/go-upload', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Upload-Token': token,
+      },
       body: JSON.stringify({
         fileName: file.name,
         fileType: file.type,
