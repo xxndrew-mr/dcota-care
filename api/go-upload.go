@@ -46,10 +46,14 @@ func init() {
 
 	// Tanpa R2_ENDPOINT client dibiarkan nil — Handler membalas error konfigurasi
 	// yang jelas alih-alih diam-diam memakai endpoint milik akun lain.
-	endpoint := os.Getenv("R2_ENDPOINT")
+	endpoint := strings.TrimSpace(os.Getenv("R2_ENDPOINT"))
 	if endpoint == "" {
 		fmt.Println("R2_ENDPOINT belum diset — endpoint upload dinonaktifkan")
 		return
+	}
+	// Toleran bila skema lupa ditulis — SDK butuh URL lengkap (dengan https://).
+	if !strings.HasPrefix(endpoint, "http") {
+		endpoint = "https://" + endpoint
 	}
 
 	s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
@@ -177,6 +181,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if os.Getenv("R2_ACCESS_KEY_ID") == "" || os.Getenv("R2_SECRET_ACCESS_KEY") == "" {
+		respondWithError(w, http.StatusInternalServerError, "Konfigurasi R2 belum lengkap (R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY). Hubungi Admin.")
+		return
+	}
+
 	var req PresignRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Format request body tidak valid")
@@ -224,7 +233,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Println("R2 Presign Error:", err)
-		respondWithError(w, http.StatusInternalServerError, "Gagal membuat upload URL")
+		respondWithError(w, http.StatusInternalServerError, "Gagal membuat upload URL: "+err.Error())
 		return
 	}
 
