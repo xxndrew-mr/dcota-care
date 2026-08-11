@@ -16,7 +16,8 @@ try {
 
 const prisma = new PrismaClient();
 
-const DATASET_ID = 'helpdesk_data';
+// Dataset khusus Dcota Care — terpisah dari 'helpdesk_data' milik Onda Care.
+const DATASET_ID = 'dcota_care';
 const TABLE_ID = 'tickets_analytics';
 
 const TABLE_SCHEMA = [

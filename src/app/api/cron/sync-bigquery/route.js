@@ -33,7 +33,9 @@ export async function GET(request) {
       },
     });
 
-    const datasetId = 'helpdesk_data';
+    // Dataset khusus Dcota Care — terpisah dari 'helpdesk_data' milik Onda Care
+    // agar data kedua aplikasi tidak tercampur.
+    const datasetId = 'dcota_care';
     const tableId = 'tickets_analytics';
     const dataset = bigquery.dataset(datasetId);
 
